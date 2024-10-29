@@ -1,18 +1,28 @@
 "use client";
 
-import Image from "next/image";
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 export default function Test() {
 
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const loadWasm = async () => {
+
+      const run = async () => {
+        if (!canvasRef.current) return;
+        const ctx = canvasRef.current.getContext("2d");
+        if (!ctx) return ;
         const CPP = await (await import('../lib/cpp.js')).default();
-        CPP.myFunction();
+        const draw = CPP.draw();
+        const array: number[] = [];
+        console.log(draw.size());
+        for (let i = 0; i < draw.size(); i++){
+          array.push(draw.get(i) as number);
+        }
+        console.log(array);
+        ctx.putImageData(new ImageData(new Uint8ClampedArray(array), 200, 200), 0, 0);
       };
-      loadWasm();
-    }
+      run();
   }, []);
 
   return (
@@ -27,7 +37,7 @@ export default function Test() {
             </p>
         </div>
         <div className="flex flex-2 flex-col max-w-[30vw] min-w-[30vw]">
-          <canvas width={600} height={600}/>
+          <canvas ref={canvasRef} width={600} height={600}/>
         </div>
         </div>
       </div>

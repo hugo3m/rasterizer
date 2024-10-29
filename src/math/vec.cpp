@@ -1,10 +1,7 @@
 #include "vec.hpp"
 
-Vec3::Vec3(double x, double y, double z)
+Vec3::Vec3(double x, double y, double z) : _x(x), _y(y), _z(z)
 {
-    this->_x = x;
-    this->_y = y;
-    this->_z = z;
 }
 
 double Vec3::getX()
