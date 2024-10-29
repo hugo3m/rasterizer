@@ -1,0 +1,8 @@
+{
+    "exec": "rm -rf lib && cmake -B lib && cmake --build lib && next dev",
+    "watch": [
+        "src",
+        "app"
+    ],
+    "ext": "ts, cpp, hpp"
+}
