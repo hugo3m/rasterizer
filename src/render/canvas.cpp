@@ -21,3 +21,30 @@ vector<int> Canvas::Render() const
     }
     return res;
 }
+
+int Canvas::_GetPixelFlatIndex(int x, int y) const
+{
+    int x_index = x + this->GetWidthMax();
+    int y_index = this->GetHeightMax() - y;
+    return (y_index * this->_width) + x_index;
+}
+
+int Canvas::GetHeightMax() const
+{
+    return this->_height / 2;
+}
+
+int Canvas::GetWidthMax() const
+{
+    return this->_width / 2;
+}
+
+void Canvas::SetPixel(int x, int y, int r, int g, int b, int a)
+{
+    this->_pixels[this->_GetPixelFlatIndex(x, y)] = RGBA(r, g, b, a);
+}
+
+void Canvas::SetPixelFromRGBA(int x, int y, RGBA rgba)
+{
+    this->_pixels[this->_GetPixelFlatIndex(x, y)] = rgba;
+}

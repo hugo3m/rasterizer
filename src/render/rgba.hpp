@@ -1,3 +1,5 @@
+#pragma once
+
 #include <array>
 
 using namespace std;
