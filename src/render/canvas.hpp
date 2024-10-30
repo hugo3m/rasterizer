@@ -13,5 +13,5 @@ private:
 public:
     Canvas(int height, int width);
 
-    void Render(vector<int> &res) const;
+    vector<int> Render() const;
 };

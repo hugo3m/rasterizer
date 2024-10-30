@@ -13,14 +13,14 @@ export default function Test() {
         const ctx = canvasRef.current.getContext("2d");
         if (!ctx) return ;
         const CPP = await (await import('../lib/cpp.js')).default();
-        const draw = CPP.draw();
+        const rasterizer = new CPP.Rasterizer();
+        const draw = rasterizer.Draw();
         const array: number[] = [];
-        console.log(draw.size());
         for (let i = 0; i < draw.size(); i++){
           array.push(draw.get(i) as number);
         }
-        console.log(array);
         ctx.putImageData(new ImageData(new Uint8ClampedArray(array), 200, 200), 0, 0);
+        rasterizer.delete();
       };
       run();
   }, []);
