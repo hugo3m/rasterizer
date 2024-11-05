@@ -25,6 +25,7 @@ set(EMCC_ARGS
   -sMODULARIZE
   -sENVIRONMENT='web'
   -sSINGLE_FILE=1
+  -sALLOW_MEMORY_GROWTH
   -s -lembind
 )
 

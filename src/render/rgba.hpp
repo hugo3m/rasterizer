@@ -16,4 +16,6 @@ public:
     RGBA(int r, int g, int b, int a);
 
     array<int, 4> Unpack() const;
+
+    RGBA operator*(double const &other) const;
 };

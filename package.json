@@ -7,7 +7,7 @@
     "build": "rm -rf lib && cmake -B lib && cmake --build lib && next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "rm -rf lib && cmake -B lib && cmake --build lib && cd lib && ctest"
+    "test": "rm -rf lib && cmake -B lib && cmake --build lib && cd lib && ctest --output-on-failure && cd .."
   },
   "dependencies": {
     "react": "^18",
