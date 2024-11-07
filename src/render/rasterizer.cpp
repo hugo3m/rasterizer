@@ -1,11 +1,45 @@
 #include "rasterizer.hpp"
 #include "../math/utils.hpp"
 
-Rasterizer::Rasterizer() : _canvas(Canvas(200, 200))
+Rasterizer::Rasterizer() : _canvas(Canvas(200, 200)), _viewport({1, 1, 1})
 {
     // this->_DrawTriangleFilled(Vec2(-70, -70), Vec2(70, -25), Vec2(80, 80), RGBA(255, 0, 0, 255));
-    this->_DrawTriangleShaded(Vec2(-70, -70), Vec2(70, -25), Vec2(80, 80), RGBA(255, 0, 0, 255));
-    this->_DrawTriangleWireframe(Vec2(-70, -70), Vec2(70, -25), Vec2(80, 80), RGBA(255, 0, 0, 255));
+    // this->_DrawTriangleShaded(Vec2(-70, -70), Vec2(70, -25), Vec2(80, 80), RGBA(255, 0, 0, 255));
+    // this->_DrawTriangleWireframe(Vec2(-70, -70), Vec2(70, -25), Vec2(80, 80), RGBA(255, 0, 0, 255));
+
+    // The four "front" vertices
+    Vec3 vAf(-2, -0.5, 5);
+    Vec3 vBf(-2, 0.5, 5);
+    Vec3 vCf(-1, 0.5, 5);
+    Vec3 vDf(-1, -0.5, 5);
+
+    // The four "back" vertices
+    Vec3 vAb(-2, -0.5, 6);
+    Vec3 vBb(-2, 0.5, 6);
+    Vec3 vCb(-1, 0.5, 6);
+    Vec3 vDb(-1, -0.5, 6);
+
+    RGBA Red(255, 0, 0, 255);
+    RGBA Blue(0, 0, 255, 255);
+    RGBA Green(0, 255, 0, 255);
+
+    // The front face
+    _DrawLine(_VertexToCanvas(vAf), _VertexToCanvas(vBf), Blue);
+    _DrawLine(_VertexToCanvas(vBf), _VertexToCanvas(vCf), Blue);
+    _DrawLine(_VertexToCanvas(vCf), _VertexToCanvas(vDf), Blue);
+    _DrawLine(_VertexToCanvas(vDf), _VertexToCanvas(vAf), Blue);
+
+    // The back face
+    _DrawLine(_VertexToCanvas(vAb), _VertexToCanvas(vBb), Red);
+    _DrawLine(_VertexToCanvas(vBb), _VertexToCanvas(vCb), Red);
+    _DrawLine(_VertexToCanvas(vCb), _VertexToCanvas(vDb), Red);
+    _DrawLine(_VertexToCanvas(vDb), _VertexToCanvas(vAb), Red);
+
+    // The front-to-back edges
+    _DrawLine(_VertexToCanvas(vAf), _VertexToCanvas(vAb), Green);
+    _DrawLine(_VertexToCanvas(vBf), _VertexToCanvas(vBb), Green);
+    _DrawLine(_VertexToCanvas(vCf), _VertexToCanvas(vCb), Green);
+    _DrawLine(_VertexToCanvas(vDf), _VertexToCanvas(vDb), Green);
 }
 
 vector<int> Rasterizer::Draw() const
@@ -142,4 +176,23 @@ void Rasterizer::_DrawTriangleShaded(Vec2 p1, Vec2 p2, Vec2 p3, RGBA color)
             this->_canvas.SetPixelFromRGBA(x, y, shadedColor);
         }
     }
+}
+
+Vec2 Rasterizer::_ViewportToCanvas(Vec2 p_viewport)
+{
+    double width_ratio = (this->_canvas.GetWidthMax() * 2) / this->_viewport.width;
+    double height_ratio = (this->_canvas.GetHeightMax() * 2) / this->_viewport.height;
+    return Vec2(p_viewport.x * width_ratio, p_viewport.y * height_ratio);
+}
+
+Vec3 Rasterizer::_VertexToViewport(Vec3 vertex)
+{
+    double ratio = this->_viewport.depth / vertex.z;
+    return Vec3(vertex.x * ratio, vertex.y * ratio, this->_viewport.depth);
+}
+
+Vec2 Rasterizer::_VertexToCanvas(Vec3 vertex)
+{
+    Vec3 vertex_to_viewport = this->_VertexToViewport(vertex);
+    return this->_ViewportToCanvas(Vec2(vertex_to_viewport.x, vertex_to_viewport.y));
 }
