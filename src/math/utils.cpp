@@ -61,3 +61,23 @@ vector<double> Interpolate(double intervalBegin, double valueBegin, double inter
     }
     return res;
 }
+
+vector<double> InterpLinear(double start, double end, double steps)
+{
+    vector<double> res;
+    if (steps < 0)
+    {
+        swap(start, end);
+        steps = -steps;
+    }
+    // descent
+    double d = (end - start) / steps;
+    double y = start;
+    for (int x = 0; x <= steps; x++)
+    {
+        res.push_back(y);
+        // y(n+1) = y(n) + d
+        y += d;
+    }
+    return res;
+}

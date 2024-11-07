@@ -3,7 +3,7 @@
 
 Rasterizer::Rasterizer() : _canvas(Canvas(200, 200))
 {
-    // this->_DrawTriangleFilled(Vec2(-70, -70), Vec2(70, -25), Vec2(80, 80), RGBA(0, 255, 0, 255));
+    // this->_DrawTriangleFilled(Vec2(-70, -70), Vec2(70, -25), Vec2(80, 80), RGBA(255, 0, 0, 255));
     this->_DrawTriangleShaded(Vec2(-70, -70), Vec2(70, -25), Vec2(80, 80), RGBA(255, 0, 0, 255));
     this->_DrawTriangleWireframe(Vec2(-70, -70), Vec2(70, -25), Vec2(80, 80), RGBA(255, 0, 0, 255));
 }
@@ -40,9 +40,9 @@ void Rasterizer::_DrawTriangleFilled(Vec2 p1, Vec2 p2, Vec2 p3, RGBA color)
     if (p3.y < p2.y)
         std::swap(p2, p3);
     // interpolate xs for every sides
-    vector<double> xs12 = Interpolate(p1.y, p1.x, p2.y, p2.x);
-    vector<double> xs13 = Interpolate(p1.y, p1.x, p3.y, p3.x);
-    vector<double> xs23 = Interpolate(p2.y, p2.x, p3.y, p3.x);
+    vector<double> xs12 = InterpLinear(p1.x, p2.x, p2.y - p1.y);
+    vector<double> xs13 = InterpLinear(p1.x, p3.x, p3.y - p1.y);
+    vector<double> xs23 = InterpLinear(p2.x, p3.x, p3.y - p2.y);
     // merge small sides together
     vector<double> xs1223;
     xs1223.insert(xs1223.end(), xs12.begin(), xs12.end() - 1);
@@ -89,13 +89,13 @@ void Rasterizer::_DrawTriangleShaded(Vec2 p1, Vec2 p2, Vec2 p3, RGBA color)
     double i2 = 0.5;
     double i3 = 0;
     // interpolate xs for every sides
-    vector<double> xs12 = Interpolate(p1.y, p1.x, p2.y, p2.x);
-    vector<double> xs13 = Interpolate(p1.y, p1.x, p3.y, p3.x);
-    vector<double> xs23 = Interpolate(p2.y, p2.x, p3.y, p3.x);
+    vector<double> xs12 = InterpLinear(p1.x, p2.x, p2.y - p1.y);
+    vector<double> xs13 = InterpLinear(p1.x, p3.x, p3.y - p1.y);
+    vector<double> xs23 = InterpLinear(p2.x, p3.x, p3.y - p2.y);
     // interpolate intensity for every height
-    vector<double> is12 = Interpolate(p1.y, i1, p2.y, i2);
-    vector<double> is13 = Interpolate(p1.y, i1, p3.y, i3);
-    vector<double> is23 = Interpolate(p2.y, i2, p3.y, i3);
+    vector<double> is12 = InterpLinear(i1, i2, p2.y - p1.y);
+    vector<double> is13 = InterpLinear(i1, i3, p3.y - p1.y);
+    vector<double> is23 = InterpLinear(i2, i3, p3.y - p2.y);
     // merge small sides together
     vector<double> xs1223;
     xs1223.insert(xs1223.end(), xs12.begin(), xs12.end() - 1);
@@ -134,7 +134,7 @@ void Rasterizer::_DrawTriangleShaded(Vec2 p1, Vec2 p2, Vec2 p3, RGBA color)
         double iLeft = isLeft[y - p1.y];
         double iRight = isRight[y - p1.y];
         // interpolate intensity from left to right
-        vector<double> is = Interpolate(xLeft, iLeft, xRight, iRight);
+        vector<double> is = InterpLinear(iLeft, iRight, xRight - xLeft);
         // draw a line from left to right
         for (int x = xLeft; x <= xRight; x++)
         {

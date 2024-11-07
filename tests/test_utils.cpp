@@ -42,3 +42,35 @@ TEST(Utils, Interpolate5)
     EXPECT_EQ(res[2], -0.2);
     // EXPECT_EQ(res[3], -0.3);
 }
+
+TEST(Utils, Interpolate6)
+{
+    vector<double> res = Interpolate(0, 0, -5, -0.5);
+    EXPECT_EQ(res.size(), 6);
+    EXPECT_EQ(res[0], -0.5);
+    // EXPECT_EQ(res[3], -0.3);
+}
+
+TEST(Utils, Interpolate7)
+{
+    vector<double> res = Interpolate(0, 0, -5, 0.5);
+    EXPECT_EQ(res.size(), 6);
+    EXPECT_EQ(res[0], 0.5);
+    // EXPECT_EQ(res[3], -0.3);
+}
+
+TEST(Utils, Interpolate8)
+{
+    vector<double> res = InterpLinear(0, -0.5, -5);
+    EXPECT_EQ(res.size(), 6);
+    EXPECT_EQ(res[0], -0.5);
+    // EXPECT_EQ(res[3], -0.3);
+}
+
+TEST(Utils, Interpolate9)
+{
+    vector<double> res = InterpLinear(0, -0.5, -5);
+    EXPECT_EQ(res.size(), 6);
+    EXPECT_EQ(res[0], -0.5);
+    // EXPECT_EQ(res[3], -0.3);
+}
