@@ -1,5 +1,11 @@
+#include <memory>
+
 #include "rasterizer.hpp"
 #include "../math/utils.hpp"
+#include "../math/triangle.hpp"
+#include "../models/cube.hpp"
+
+using namespace std;
 
 Rasterizer::Rasterizer() : _canvas(Canvas(200, 200)), _viewport({1, 1, 1})
 {
@@ -8,38 +14,35 @@ Rasterizer::Rasterizer() : _canvas(Canvas(200, 200)), _viewport({1, 1, 1})
     // this->_DrawTriangleWireframe(Vec2(-70, -70), Vec2(70, -25), Vec2(80, 80), RGBA(255, 0, 0, 255));
 
     // The four "front" vertices
-    Vec3 vAf(-2, -0.5, 5);
-    Vec3 vBf(-2, 0.5, 5);
-    Vec3 vCf(-1, 0.5, 5);
-    Vec3 vDf(-1, -0.5, 5);
-
+    shared_ptr<Vec3> v1 = make_shared<Vec3>(1, 1, 1);
+    shared_ptr<Vec3> v2 = make_shared<Vec3>(-1, 1, 1);
+    shared_ptr<Vec3> v3 = make_shared<Vec3>(-1, -1, 1);
+    shared_ptr<Vec3> v4 = make_shared<Vec3>(1, -1, 1);
     // The four "back" vertices
-    Vec3 vAb(-2, -0.5, 6);
-    Vec3 vBb(-2, 0.5, 6);
-    Vec3 vCb(-1, 0.5, 6);
-    Vec3 vDb(-1, -0.5, 6);
+    shared_ptr<Vec3> v5 = make_shared<Vec3>(1, 1, -1);
+    shared_ptr<Vec3> v6 = make_shared<Vec3>(-1, 1, -1);
+    shared_ptr<Vec3> v7 = make_shared<Vec3>(-1, -1, -1);
+    shared_ptr<Vec3> v8 = make_shared<Vec3>(1, -1, -1);
+    // the triangle model
+    shared_ptr<Triangle> t1 = make_shared<Triangle>(v1, v2, v3);
+    shared_ptr<Triangle> t2 = make_shared<Triangle>(v1, v3, v4);
+    shared_ptr<Triangle> t3 = make_shared<Triangle>(v5, v1, v2);
+    shared_ptr<Triangle> t4 = make_shared<Triangle>(v5, v4, v8);
+    shared_ptr<Triangle> t5 = make_shared<Triangle>(v6, v5, v8);
+    shared_ptr<Triangle> t6 = make_shared<Triangle>(v6, v8, v7);
+    shared_ptr<Triangle> t7 = make_shared<Triangle>(v2, v6, v7);
+    shared_ptr<Triangle> t8 = make_shared<Triangle>(v2, v7, v3);
+    shared_ptr<Triangle> t9 = make_shared<Triangle>(v5, v6, v2);
+    shared_ptr<Triangle> t10 = make_shared<Triangle>(v5, v2, v1);
+    shared_ptr<Triangle> t11 = make_shared<Triangle>(v3, v7, v8);
+    shared_ptr<Triangle> t12 = make_shared<Triangle>(v3, v8, v4);
+    // the cube model
+    shared_ptr<CubeModel> c1 = make_shared<CubeModel>(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12);
+    // the cube instance
+    this->_instances.push_back(Instance(c1, Vec3(-1.5, 0, 7)));
+    this->_instances.push_back(Instance(c1, Vec3(2, -2, 10)));
 
-    RGBA Red(255, 0, 0, 255);
-    RGBA Blue(0, 0, 255, 255);
-    RGBA Green(0, 255, 0, 255);
-
-    // The front face
-    _DrawLine(_VertexToCanvas(vAf), _VertexToCanvas(vBf), Blue);
-    _DrawLine(_VertexToCanvas(vBf), _VertexToCanvas(vCf), Blue);
-    _DrawLine(_VertexToCanvas(vCf), _VertexToCanvas(vDf), Blue);
-    _DrawLine(_VertexToCanvas(vDf), _VertexToCanvas(vAf), Blue);
-
-    // The back face
-    _DrawLine(_VertexToCanvas(vAb), _VertexToCanvas(vBb), Red);
-    _DrawLine(_VertexToCanvas(vBb), _VertexToCanvas(vCb), Red);
-    _DrawLine(_VertexToCanvas(vCb), _VertexToCanvas(vDb), Red);
-    _DrawLine(_VertexToCanvas(vDb), _VertexToCanvas(vAb), Red);
-
-    // The front-to-back edges
-    _DrawLine(_VertexToCanvas(vAf), _VertexToCanvas(vAb), Green);
-    _DrawLine(_VertexToCanvas(vBf), _VertexToCanvas(vBb), Green);
-    _DrawLine(_VertexToCanvas(vCf), _VertexToCanvas(vCb), Green);
-    _DrawLine(_VertexToCanvas(vDf), _VertexToCanvas(vDb), Green);
+    this->_Render();
 }
 
 vector<int> Rasterizer::Draw() const
@@ -196,3 +199,24 @@ Vec2 Rasterizer::_VertexToCanvas(Vec3 vertex)
     Vec3 vertex_to_viewport = this->_VertexToViewport(vertex);
     return this->_ViewportToCanvas(Vec2(vertex_to_viewport.x, vertex_to_viewport.y));
 }
+
+void Rasterizer::_Render()
+{
+    for (const Instance &instance : this->_instances)
+    {
+        this->_RenderInstance(instance);
+    }
+};
+
+void Rasterizer::_RenderInstance(const Instance &instance)
+{
+    Vec3 position = instance.GetPosition();
+    for (auto triangle : instance.GetModel()->GetTriangles())
+    {
+        array<shared_ptr<Vec3>, 3> vertices = triangle->GetVertices();
+        Vec2 v1 = this->_VertexToCanvas(*vertices[0] + position);
+        Vec2 v2 = this->_VertexToCanvas(*vertices[1] + position);
+        Vec2 v3 = this->_VertexToCanvas(*vertices[2] + position);
+        this->_DrawTriangleWireframe(v1, v2, v3, RGBA(255, 0, 0, 255));
+    }
+};
