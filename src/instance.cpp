@@ -1,13 +1,13 @@
 #include "instance.hpp"
 
-Instance::Instance(shared_ptr<Model> model, Vec3 position) : _model(model), _position(position) {};
+Instance::Instance(shared_ptr<Model> model, Transform transform) : _model(model), _transform(transform) {};
 
 shared_ptr<Model> Instance::GetModel() const
 {
     return this->_model;
 };
 
-Vec3 Instance::GetPosition() const
+Transform Instance::GetTransform() const
 {
-    return this->_position;
+    return this->_transform;
 };

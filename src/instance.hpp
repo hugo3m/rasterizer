@@ -3,6 +3,7 @@
 #include <memory>
 #include "models/model.hpp"
 #include "math/vec.hpp"
+#include "transform.hpp"
 
 using namespace std;
 
@@ -10,10 +11,10 @@ class Instance
 {
 private:
     shared_ptr<Model> _model;
-    Vec3 _position;
+    Transform _transform;
 
 public:
-    Instance(shared_ptr<Model> model, Vec3 position);
+    Instance(shared_ptr<Model> model, Transform transform);
     shared_ptr<Model> GetModel() const;
-    Vec3 GetPosition() const;
+    Transform GetTransform() const;
 };

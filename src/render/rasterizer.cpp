@@ -1,6 +1,7 @@
 #include <memory>
 
 #include "rasterizer.hpp"
+#include "../transform.hpp"
 #include "../math/utils.hpp"
 #include "../math/triangle.hpp"
 #include "../models/cube.hpp"
@@ -39,8 +40,8 @@ Rasterizer::Rasterizer() : _canvas(Canvas(200, 200)), _viewport({1, 1, 1})
     // the cube model
     shared_ptr<CubeModel> c1 = make_shared<CubeModel>(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12);
     // the cube instance
-    this->_instances.push_back(Instance(c1, Vec3(-1.5, 0, 7)));
-    this->_instances.push_back(Instance(c1, Vec3(2, -2, 10)));
+    this->_instances.push_back(Instance(c1, Transform(Vec3(-1.5, 0, 7), 0, 1)));
+    this->_instances.push_back(Instance(c1, Transform(Vec3(-1.5, 0, 7), 0, 1)));
 
     this->_Render();
 }
@@ -210,7 +211,7 @@ void Rasterizer::_Render()
 
 void Rasterizer::_RenderInstance(const Instance &instance)
 {
-    Vec3 position = instance.GetPosition();
+    Vec3 position = instance.GetTransform().GetTranslation();
     for (auto triangle : instance.GetModel()->GetTriangles())
     {
         array<shared_ptr<Vec3>, 3> vertices = triangle->GetVertices();
