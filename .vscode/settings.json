@@ -64,6 +64,10 @@
     "system_error": "cpp",
     "type_traits": "cpp",
     "utility": "cpp",
-    "thread": "cpp"
+    "thread": "cpp",
+    "bitset": "cpp",
+    "queue": "cpp",
+    "span": "cpp",
+    "stack": "cpp"
   }
 }

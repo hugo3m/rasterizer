@@ -1,5 +1,8 @@
 #pragma once
 
+#include <vector>
+
+using namespace std;
 class Vec2
 {
 public:
