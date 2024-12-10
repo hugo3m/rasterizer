@@ -56,3 +56,59 @@ TEST(Matrix, OperatorMulVecHomogenous)
     EXPECT_EQ(res.z, init.z);
     EXPECT_EQ(res.w, init.w);
 }
+
+TEST(Matrix, Minor)
+{
+    Matrix matrix = Matrix({1, 2, 3, 4, 5, 6, 7, 8, 9}, 3, 3);
+    Matrix res = matrix.Minor(0, 0);
+    EXPECT_EQ(res.GetColumnLength(), 2);
+    EXPECT_EQ(res.GetRowLength(), 2);
+    EXPECT_EQ(res[0][0], 5);
+    EXPECT_EQ(res[0][1], 6);
+    EXPECT_EQ(res[1][0], 8);
+    EXPECT_EQ(res[1][1], 9);
+}
+
+TEST(Matrix, Determinant22)
+{
+    Matrix matrix = Matrix({3, 8, 4, 6}, 2, 2);
+    EXPECT_EQ(matrix.Determinant(), -14);
+}
+
+TEST(Matrix, Determinant44)
+{
+    Matrix matrix = Matrix({5, 8, -6, 6, 2, -8, 1, 3, -5, 5, 2, -1, 3, 9, 7, -4}, 4, 4);
+    EXPECT_EQ(matrix.Determinant(), 3766);
+}
+
+TEST(Matrix, Comatrice)
+{
+    Matrix matrix = Matrix({1, 2, 3, 0, 1, 2, -1, -4, -1}, 3, 3);
+    Matrix comatrix = matrix.Comatrix();
+    Matrix expect = Matrix({7, -2, 1, -10, 2, 2, 1, -2, 1}, 3, 3);
+    EXPECT_EQ(comatrix[0][0], expect[0][0]);
+    EXPECT_EQ(comatrix[0][1], expect[0][1]);
+    EXPECT_EQ(comatrix[0][2], expect[0][2]);
+    EXPECT_EQ(comatrix[1][0], expect[1][0]);
+    EXPECT_EQ(comatrix[1][1], expect[1][1]);
+    EXPECT_EQ(comatrix[1][2], expect[1][2]);
+    EXPECT_EQ(comatrix[2][0], expect[2][0]);
+    EXPECT_EQ(comatrix[2][1], expect[2][1]);
+    EXPECT_EQ(comatrix[2][2], expect[2][2]);
+}
+
+TEST(Matrix, Transpose)
+{
+    Matrix matrix = Matrix({7, -2, 1, -10, 2, 2, 1, -2, 1}, 3, 3);
+    Matrix transpose = matrix.Transpose();
+    Matrix expect = Matrix({7, -10, 1, -2, 2, -2, 1, 2, 1}, 3, 3);
+    EXPECT_EQ(transpose[0][0], expect[0][0]);
+    EXPECT_EQ(transpose[0][1], expect[0][1]);
+    EXPECT_EQ(transpose[0][2], expect[0][2]);
+    EXPECT_EQ(transpose[1][0], expect[1][0]);
+    EXPECT_EQ(transpose[1][1], expect[1][1]);
+    EXPECT_EQ(transpose[1][2], expect[1][2]);
+    EXPECT_EQ(transpose[2][0], expect[2][0]);
+    EXPECT_EQ(transpose[2][1], expect[2][1]);
+    EXPECT_EQ(transpose[2][2], expect[2][2]);
+}

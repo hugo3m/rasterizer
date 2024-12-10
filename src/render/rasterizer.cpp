@@ -8,7 +8,7 @@
 
 using namespace std;
 
-Rasterizer::Rasterizer() : _canvas(Canvas(200, 200)), _viewport({1, 1, 1})
+Rasterizer::Rasterizer() : _canvas(Canvas(200, 200)), _viewport({1, 1, 1}), _camera(Transform(Vec3(0, 0, 0), 0, 0))
 {
     // this->_DrawTriangleFilled(Vec2(-70, -70), Vec2(70, -25), Vec2(80, 80), RGBA(255, 0, 0, 255));
     // this->_DrawTriangleShaded(Vec2(-70, -70), Vec2(70, -25), Vec2(80, 80), RGBA(255, 0, 0, 255));
@@ -221,3 +221,7 @@ void Rasterizer::_RenderInstance(const Instance &instance)
         this->_DrawTriangleWireframe(v1, v2, v3, RGBA(255, 0, 0, 255));
     }
 };
+
+Matrix _GenerateMatrixCamera(Transform camera)
+{
+}

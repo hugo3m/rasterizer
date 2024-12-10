@@ -1,5 +1,6 @@
 #include "matrix.hpp"
 #include <stdexcept>
+#include <cmath>
 
 MatrixProxy::MatrixProxy(std::vector<double> &row) : _row(row) {};
 
@@ -106,3 +107,79 @@ VecHomogenous Matrix::operator*(const VecHomogenous &vec) const
     Matrix res = (*this) * Matrix(vec);
     return VecHomogenous(res[0][0], res[1][0], res[2][0], res[3][0]);
 };
+
+double Matrix::Determinant() const
+{
+    unsigned int size = this->GetColumnLength();
+    if (size != this->GetRowLength())
+    {
+        throw invalid_argument("impossible to mathematically calculate determinant on unsquare matrixes");
+    }
+    if (size == 1)
+    {
+        return this->Get(0, 0);
+    }
+    if (size == 2)
+    {
+        return (this->Get(0, 0) * this->Get(1, 1)) - (this->Get(0, 1) * this->Get(1, 0));
+    }
+    double determinant = 0;
+    for (unsigned int i = 0; i < size; i++)
+    {
+        int sign = pow(-1, i);
+        double cofactor = sign * this->Get(0, i);
+        Matrix minor = this->Minor(0, i);
+        determinant += cofactor * minor.Determinant();
+    }
+    return determinant;
+}
+
+Matrix Matrix::Minor(unsigned int row, unsigned int column) const
+{
+    vector<double> data;
+    for (unsigned int itRow = 0; itRow < this->GetRowLength(); itRow++)
+    {
+        if (itRow == row)
+        {
+            continue;
+        }
+        for (unsigned int itColumn = 0; itColumn < this->GetColumnLength(); itColumn++)
+        {
+            if (itColumn == column)
+            {
+                continue;
+            }
+            data.push_back(this->Get(itRow, itColumn));
+        }
+    }
+    return Matrix(data, this->GetRowLength() - 1, this->GetColumnLength() - 1);
+}
+
+Matrix Matrix::Comatrix() const
+{
+    vector<double> data;
+    for (unsigned int itRow = 0; itRow < this->GetRowLength(); itRow++)
+    {
+        for (unsigned int itColumn = 0; itColumn < this->GetColumnLength(); itColumn++)
+        {
+            int sign = pow(-1, (itRow * this->GetRowLength()) + itColumn);
+            Matrix minor = this->Minor(itRow, itColumn);
+            double determinant = minor.Determinant();
+            data.push_back(sign * determinant);
+        }
+    }
+    return Matrix(data, this->GetRowLength(), this->GetColumnLength());
+}
+
+Matrix Matrix::Transpose() const
+{
+    vector<double> data;
+    for (unsigned int itColumn = 0; itColumn < this->GetColumnLength(); itColumn++)
+    {
+        for (unsigned int itRow = 0; itRow < this->GetRowLength(); itRow++)
+        {
+            data.push_back(this->Get(itRow, itColumn));
+        }
+    }
+    return Matrix(data, this->GetColumnLength(), this->GetRowLength());
+}

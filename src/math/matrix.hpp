@@ -40,6 +40,14 @@ public:
 
     unsigned int GetColumnLength() const;
 
+    double Determinant() const;
+
+    Matrix Minor(unsigned int row, unsigned int column) const;
+
+    Matrix Comatrix() const;
+
+    Matrix Transpose() const;
+
     Matrix operator*(const Matrix &vec) const;
 
     Vec2 operator*(const Vec2 &vec) const;

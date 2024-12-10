@@ -6,6 +6,7 @@
 #include "viewport.hpp"
 #include "../instance.hpp"
 #include "../math/vec.hpp"
+#include "../math/matrix.hpp"
 
 class Rasterizer
 {
@@ -13,6 +14,7 @@ private:
     Canvas _canvas;
     vector<Instance> _instances;
     Viewport _viewport;
+    Transform _camera;
 
     void _DrawLine(Vec2 from, Vec2 to, RGBA color);
 
@@ -31,6 +33,8 @@ private:
     Vec3 _VertexToViewport(Vec3 vertex);
 
     Vec2 _ViewportToCanvas(Vec2 p_viewport);
+
+    Matrix _GenerateMatrixCamera(Transform camera);
 
 public:
     Rasterizer();
