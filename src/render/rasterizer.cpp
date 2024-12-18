@@ -8,7 +8,7 @@
 
 using namespace std;
 
-Rasterizer::Rasterizer() : _canvas(Canvas(200, 200)), _viewport({1, 1, 1}), _camera(Transform(Vec3(0, 0, 0), 0, 0))
+Rasterizer::Rasterizer() : _canvas(Canvas(200, 200)), _viewport({1, 1, 1}), _camera(Transform(Vec3(0, 0, 0), 0, 0)), _matrixProjection(GenerateMatrixProjection(_canvas, _viewport))
 {
     // this->_DrawTriangleFilled(Vec2(-70, -70), Vec2(70, -25), Vec2(80, 80), RGBA(255, 0, 0, 255));
     // this->_DrawTriangleShaded(Vec2(-70, -70), Vec2(70, -25), Vec2(80, 80), RGBA(255, 0, 0, 255));
@@ -41,7 +41,7 @@ Rasterizer::Rasterizer() : _canvas(Canvas(200, 200)), _viewport({1, 1, 1}), _cam
     shared_ptr<CubeModel> c1 = make_shared<CubeModel>(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12);
     // the cube instance
     this->_instances.push_back(Instance(c1, Transform(Vec3(-1.5, 0, 7), 0, 1)));
-    this->_instances.push_back(Instance(c1, Transform(Vec3(-1.5, 0, 7), 0, 1)));
+    this->_instances.push_back(Instance(c1, Transform(Vec3(1, 0, 10), 0, 1)));
 
     this->_Render();
 }
@@ -203,25 +203,57 @@ Vec2 Rasterizer::_VertexToCanvas(Vec3 vertex)
 
 void Rasterizer::_Render()
 {
+    Matrix matrixCamera = GenerateMatrixCamera(this->_camera);
     for (const Instance &instance : this->_instances)
     {
-        this->_RenderInstance(instance);
+        this->_RenderInstance(instance, matrixCamera);
     }
 };
 
-void Rasterizer::_RenderInstance(const Instance &instance)
+void Rasterizer::_RenderInstance(const Instance &instance, const Matrix &matrixCamera)
 {
     Vec3 position = instance.GetTransform().GetTranslation();
+    Matrix matrixInstance = GenerateMatrixInstance(instance);
+    Matrix matrixFactor = this->_matrixProjection * matrixCamera * matrixInstance;
     for (auto triangle : instance.GetModel()->GetTriangles())
     {
         array<shared_ptr<Vec3>, 3> vertices = triangle->GetVertices();
-        Vec2 v1 = this->_VertexToCanvas(*vertices[0] + position);
-        Vec2 v2 = this->_VertexToCanvas(*vertices[1] + position);
-        Vec2 v3 = this->_VertexToCanvas(*vertices[2] + position);
-        this->_DrawTriangleWireframe(v1, v2, v3, RGBA(255, 0, 0, 255));
+        // multiply each vertices
+        unique_ptr<Vec> v1Factored = matrixFactor * VecHomogenous((*vertices[0]).x, (*vertices[0]).y, (*vertices[0]).z, 1);
+        unique_ptr<Vec> v2Factored = matrixFactor * VecHomogenous((*vertices[1]).x, (*vertices[1]).y, (*vertices[1]).z, 1);
+        unique_ptr<Vec> v3Factored = matrixFactor * VecHomogenous((*vertices[2]).x, (*vertices[2]).y, (*vertices[2]).z, 1);
+        // cast to vec3
+        Vec3 *v1 = dynamic_cast<Vec3 *>(v1Factored.get());
+        Vec3 *v2 = dynamic_cast<Vec3 *>(v2Factored.get());
+        Vec3 *v3 = dynamic_cast<Vec3 *>(v3Factored.get());
+        if (v1 && v2 && v3)
+        {
+            Vec2 fV1 = Vec2(v1->x, v1->y) * (1 / v1->z);
+            Vec2 fV2 = Vec2(v2->x, v2->y) * (1 / v2->z);
+            Vec2 fV3 = Vec2(v3->x, v3->y) * (1 / v3->z);
+            this->_DrawTriangleWireframe(fV1, fV2, fV3, RGBA(255, 120, 200, 255));
+        }
     }
 };
 
-Matrix _GenerateMatrixCamera(Transform camera)
+Matrix GenerateMatrixCamera(const Transform &camera)
 {
+    Vec3 translation = camera.GetTranslation();
+    Matrix translationMatrix = Matrix({1, 0, 0, translation.x, 0, 1, 0, translation.y, 0, 0, 1, translation.z, 0, 0, 0, 1}, 4, 4);
+    return translationMatrix.Inverse();
+}
+
+Matrix GenerateMatrixProjection(const Canvas &canvas, const Viewport &viewport)
+{
+    double widthRatio = (viewport.depth * canvas.GetWidthMax() * 2) / viewport.width;
+    double heightRatio = (viewport.depth * canvas.GetHeightMax() * 2) / viewport.height;
+    return Matrix({widthRatio, 0, 0, 0, 0, heightRatio, 0, 0, 0, 0, 1, 0}, 3, 4);
+}
+
+Matrix GenerateMatrixInstance(const Instance &instance)
+{
+    Transform transform = instance.GetTransform();
+    Vec3 translation = transform.GetTranslation();
+    Matrix matrixTranslation = Matrix({1, 0, 0, translation.x, 0, 1, 0, translation.y, 0, 0, 1, translation.z, 0, 0, 0, 1}, 4, 4);
+    return matrixTranslation;
 }

@@ -7,6 +7,11 @@ unsigned int Vec2::GetLength() const
     return 2;
 };
 
+Vec2 Vec2::operator*(double const &other) const
+{
+    return Vec2(this->x * other, this->y * other);
+}
+
 Vec3::Vec3(double x, double y, double z) : Vec2(x, y), z(z) {};
 
 unsigned int Vec3::GetLength() const

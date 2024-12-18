@@ -3,7 +3,13 @@
 #include <vector>
 
 using namespace std;
-class Vec2
+
+class Vec
+{
+public:
+    virtual unsigned int GetLength() const = 0;
+};
+class Vec2 : public Vec
 {
 public:
     double x;
@@ -11,7 +17,9 @@ public:
 
     Vec2(double x, double y);
 
-    unsigned int GetLength() const;
+    virtual unsigned int GetLength() const override;
+
+    Vec2 operator*(double const &other) const;
 };
 class Vec3 : public Vec2
 {
@@ -22,7 +30,7 @@ public:
 
     Vec3 operator+(Vec3 const &other) const;
 
-    unsigned int GetLength() const;
+    unsigned int GetLength() const override;
 };
 
 class VecHomogenous : public Vec3
@@ -32,5 +40,5 @@ public:
 
     VecHomogenous(double x, double y, double z, double w);
 
-    unsigned int GetLength() const;
+    unsigned int GetLength() const override;
 };

@@ -4,12 +4,12 @@
 
 MatrixProxy::MatrixProxy(std::vector<double> &row) : _row(row) {};
 
-double MatrixProxy::operator[](unsigned int column)
+double &MatrixProxy::operator[](unsigned int column)
 {
     return _row[column];
 };
 
-Matrix::Matrix(vector<double> data, unsigned int rowLength, unsigned int columnLength) : _rowLength(rowLength), _columnLength(columnLength)
+Matrix::Matrix(const vector<double> &data, unsigned int rowLength, unsigned int columnLength) : _rowLength(rowLength), _columnLength(columnLength)
 {
     if (data.size() != _rowLength * _columnLength)
     {
@@ -25,6 +25,19 @@ Matrix::Matrix(vector<double> data, unsigned int rowLength, unsigned int columnL
         _data.push_back(temp);
     }
 };
+
+Matrix::Matrix(const Matrix &matrix) : _rowLength(matrix.GetRowLength()), _columnLength(matrix.GetColumnLength())
+{
+    for (unsigned int i = 0; i < _rowLength; i++)
+    {
+        vector<double> temp;
+        for (unsigned int j = 0; j < _columnLength; j++)
+        {
+            temp.push_back(matrix.Get(i, j));
+        }
+        _data.push_back(temp);
+    }
+}
 
 Matrix::Matrix(const Vec2 &vec) : _rowLength(2), _columnLength(1)
 {
@@ -90,22 +103,39 @@ Matrix Matrix::operator*(const Matrix &other) const
     return Matrix(res, this->GetRowLength(), other.GetColumnLength());
 };
 
-Vec2 Matrix::operator*(const Vec2 &vec) const
+unique_ptr<Vec> Matrix::ToVec() const
 {
-    Matrix res = (*this) * Matrix(vec);
-    return Vec2(res[0][0], res[1][0]);
+    if (this->GetRowLength() == 2)
+    {
+        return make_unique<Vec2>(this->Get(0, 0), this->Get(1, 0));
+    }
+    if (this->GetRowLength() == 3)
+    {
+        return make_unique<Vec3>(this->Get(0, 0), this->Get(1, 0), this->Get(2, 0));
+    }
+    if (this->GetRowLength() == 4)
+    {
+        return make_unique<VecHomogenous>(this->Get(0, 0), this->Get(1, 0), this->Get(2, 0), this->Get(3, 0));
+    }
+    throw invalid_argument("impossible to convert to vec");
 };
 
-Vec3 Matrix::operator*(const Vec3 &vec) const
+unique_ptr<Vec> Matrix::operator*(const Vec2 &vec) const
 {
     Matrix res = (*this) * Matrix(vec);
-    return Vec3(res[0][0], res[1][0], res[2][0]);
+    return res.ToVec();
 };
 
-VecHomogenous Matrix::operator*(const VecHomogenous &vec) const
+unique_ptr<Vec> Matrix::operator*(const Vec3 &vec) const
 {
     Matrix res = (*this) * Matrix(vec);
-    return VecHomogenous(res[0][0], res[1][0], res[2][0], res[3][0]);
+    return res.ToVec();
+};
+
+unique_ptr<Vec> Matrix::operator*(const VecHomogenous &vec) const
+{
+    Matrix res = (*this) * Matrix(vec);
+    return res.ToVec();
 };
 
 double Matrix::Determinant() const
@@ -155,7 +185,7 @@ Matrix Matrix::Minor(unsigned int row, unsigned int column) const
     return Matrix(data, this->GetRowLength() - 1, this->GetColumnLength() - 1);
 }
 
-Matrix Matrix::Comatrix() const
+Matrix Matrix::Cofactor() const
 {
     vector<double> data;
     for (unsigned int itRow = 0; itRow < this->GetRowLength(); itRow++)
@@ -182,4 +212,35 @@ Matrix Matrix::Transpose() const
         }
     }
     return Matrix(data, this->GetColumnLength(), this->GetRowLength());
+}
+
+Matrix Matrix::operator*(const double &fact) const
+{
+    Matrix res = Matrix(*this);
+    for (unsigned int itRow = 0; itRow < this->GetRowLength(); itRow++)
+    {
+        for (unsigned int itColumn = 0; itColumn < this->GetColumnLength(); itColumn++)
+        {
+
+            res[itRow][itColumn] = res[itRow][itColumn] * fact;
+        }
+    }
+    return res;
+}
+
+Matrix Matrix::Adjoint() const
+{
+    Matrix cofactor = this->Cofactor();
+    return cofactor.Transpose();
+}
+
+Matrix Matrix::Inverse() const
+{
+    double determinant = this->Determinant();
+    if (determinant == 0)
+    {
+        throw invalid_argument("impossible to inverse matrix with determinant = 0");
+    }
+    Matrix adjoint = this->Adjoint();
+    return adjoint * (1 / determinant);
 }

@@ -13,7 +13,7 @@ private:
 public:
     MatrixProxy(std::vector<double> &row);
 
-    double operator[](unsigned int column);
+    double &operator[](unsigned int column);
 };
 
 class Matrix
@@ -24,13 +24,15 @@ private:
     unsigned int _columnLength;
 
 public:
-    Matrix(vector<double> data, unsigned int rowLength, unsigned int columnLength);
+    Matrix(const vector<double> &data, unsigned int rowLength, unsigned int columnLength);
 
     Matrix(const Vec2 &vec);
 
     Matrix(const Vec3 &vec);
 
     Matrix(const VecHomogenous &vec);
+
+    Matrix(const Matrix &matrix);
 
     MatrixProxy operator[](unsigned int row);
 
@@ -44,15 +46,23 @@ public:
 
     Matrix Minor(unsigned int row, unsigned int column) const;
 
-    Matrix Comatrix() const;
+    Matrix Cofactor() const;
+
+    Matrix Adjoint() const;
 
     Matrix Transpose() const;
 
+    Matrix Inverse() const;
+
     Matrix operator*(const Matrix &vec) const;
 
-    Vec2 operator*(const Vec2 &vec) const;
+    Matrix operator*(const double &fact) const;
 
-    Vec3 operator*(const Vec3 &vec) const;
+    unique_ptr<Vec> ToVec() const;
 
-    VecHomogenous operator*(const VecHomogenous &vec) const;
+    unique_ptr<Vec> operator*(const Vec2 &vec) const;
+
+    unique_ptr<Vec> operator*(const Vec3 &vec) const;
+
+    unique_ptr<Vec> operator*(const VecHomogenous &vec) const;
 };
