@@ -8,7 +8,7 @@
 
 using namespace std;
 
-Rasterizer::Rasterizer() : _canvas(Canvas(200, 200)), _viewport({1, 1, 1}), _camera(Transform(Vec3(0, 0, 0), 0, 0)), _matrixProjection(GenerateMatrixProjection(_canvas, _viewport))
+Rasterizer::Rasterizer() : _canvas(Canvas(200, 200)), _viewport({1, 1, 1}), _camera(Transform(Vec3(0, 0, 0), 0, Vec3(0, 0, 0))), _matrixProjection(GenerateMatrixProjection(_canvas, _viewport))
 {
     // this->_DrawTriangleFilled(Vec2(-70, -70), Vec2(70, -25), Vec2(80, 80), RGBA(255, 0, 0, 255));
     // this->_DrawTriangleShaded(Vec2(-70, -70), Vec2(70, -25), Vec2(80, 80), RGBA(255, 0, 0, 255));
@@ -40,8 +40,8 @@ Rasterizer::Rasterizer() : _canvas(Canvas(200, 200)), _viewport({1, 1, 1}), _cam
     // the cube model
     shared_ptr<CubeModel> c1 = make_shared<CubeModel>(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12);
     // the cube instance
-    this->_instances.push_back(Instance(c1, Transform(Vec3(-1.5, 0, 7), 0, 1)));
-    this->_instances.push_back(Instance(c1, Transform(Vec3(1, 0, 10), 0, 1)));
+    this->_instances.push_back(Instance(c1, Transform(Vec3(-1.5, 0, 7), 0, Vec3(1, 1, 1))));
+    this->_instances.push_back(Instance(c1, Transform(Vec3(1, 0, 10), 0, Vec3(2, 2, 2))));
 
     this->_Render();
 }
@@ -232,7 +232,13 @@ void Rasterizer::_RenderInstance(const Instance &instance, const Matrix &matrixC
             Vec2 fV2 = Vec2(v2->x, v2->y) * (1 / v2->z);
             Vec2 fV3 = Vec2(v3->x, v3->y) * (1 / v3->z);
             this->_DrawTriangleWireframe(fV1, fV2, fV3, RGBA(255, 120, 200, 255));
+            delete v1;
+            delete v2;
+            delete v3;
         }
+        v1Factored.release();
+        v2Factored.release();
+        v3Factored.release();
     }
 };
 
@@ -254,6 +260,9 @@ Matrix GenerateMatrixInstance(const Instance &instance)
 {
     Transform transform = instance.GetTransform();
     Vec3 translation = transform.GetTranslation();
+    Vec3 scale = transform.GetScale();
     Matrix matrixTranslation = Matrix({1, 0, 0, translation.x, 0, 1, 0, translation.y, 0, 0, 1, translation.z, 0, 0, 0, 1}, 4, 4);
-    return matrixTranslation;
+    Matrix matrixScale = Matrix({translation.x, 0, 0, 0, 0, translation.y, 0, 0, 0, 0, translation.z, 0, 0, 0, 0, 1}, 4, 4);
+    return matrixTranslation * matrixScale;
+    // return matrixTranslation;
 }

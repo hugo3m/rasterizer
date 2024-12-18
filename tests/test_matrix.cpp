@@ -27,6 +27,29 @@ TEST(Matrix, OperatorMulMatrix)
     EXPECT_EQ(res[1][1], init[1][1]);
 }
 
+TEST(Matrix, OperatorMulMatrix2)
+{
+    Matrix matrix = Matrix({1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}, 4, 4);
+    Matrix init = Matrix({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16}, 4, 4);
+    Matrix res = matrix * init;
+    EXPECT_EQ(res[0][0], init[0][0]);
+    EXPECT_EQ(res[0][1], init[0][1]);
+    EXPECT_EQ(res[1][0], init[1][0]);
+    EXPECT_EQ(res[1][1], init[1][1]);
+    EXPECT_EQ(res[0][2], init[0][2]);
+    EXPECT_EQ(res[0][3], init[0][3]);
+    EXPECT_EQ(res[1][2], init[1][2]);
+    EXPECT_EQ(res[1][3], init[1][3]);
+    EXPECT_EQ(res[2][0], init[2][0]);
+    EXPECT_EQ(res[2][1], init[2][1]);
+    EXPECT_EQ(res[3][0], init[3][0]);
+    EXPECT_EQ(res[3][1], init[3][1]);
+    EXPECT_EQ(res[2][2], init[2][2]);
+    EXPECT_EQ(res[2][3], init[2][3]);
+    EXPECT_EQ(res[3][2], init[3][2]);
+    EXPECT_EQ(res[3][3], init[3][3]);
+}
+
 TEST(Matrix, OperatorMulVec2)
 {
     Matrix matrix = Matrix({1, 0, 0, 1}, 2, 2);

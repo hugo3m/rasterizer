@@ -25,7 +25,9 @@ set(EMCC_ARGS
   -sMODULARIZE
   -sENVIRONMENT='web'
   -sSINGLE_FILE=1
-  -sALLOW_MEMORY_GROWTH
+  -sALLOW_MEMORY_GROWTH=1
+  # -sMAXIMUM_MEMORY=4GB
+  --memoryprofiler
   -s -lembind
 )
 

@@ -8,6 +8,7 @@ class Vec
 {
 public:
     virtual unsigned int GetLength() const = 0;
+    virtual ~Vec();
 };
 class Vec2 : public Vec
 {
@@ -30,7 +31,7 @@ public:
 
     Vec3 operator+(Vec3 const &other) const;
 
-    unsigned int GetLength() const override;
+    virtual unsigned int GetLength() const override;
 };
 
 class VecHomogenous : public Vec3
@@ -40,5 +41,5 @@ public:
 
     VecHomogenous(double x, double y, double z, double w);
 
-    unsigned int GetLength() const override;
+    virtual unsigned int GetLength() const override;
 };

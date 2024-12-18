@@ -1,5 +1,8 @@
 #include "vec.hpp"
 
+Vec::~Vec() {
+};
+
 Vec2::Vec2(double x, double y) : x(x), y(y) {};
 
 unsigned int Vec2::GetLength() const
