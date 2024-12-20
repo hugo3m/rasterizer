@@ -18,23 +18,17 @@ private:
 
     Matrix _matrixProjection;
 
-    void _DrawLine(Vec2 from, Vec2 to, RGBA color);
+    void _DrawLine(const Vec2 &from, const Vec2 &to, const RGBA &color);
 
-    void _DrawTriangleWireframe(Vec2 p1, Vec2 p2, Vec2 p3, RGBA color);
+    void _DrawTriangleWireframe(const Vec2 &p1, const Vec2 &p2, const Vec2 &p3, const RGBA &color);
 
-    void _DrawTriangleFilled(Vec2 p1, Vec2 p2, Vec2 p3, RGBA color);
+    void _DrawTriangleFilled(Vec2 p1, Vec2 p2, Vec2 p3, const RGBA &color);
 
-    void _DrawTriangleShaded(Vec2 p1, Vec2 p2, Vec2 p3, RGBA color);
+    void _DrawTriangleShaded(Vec2 p1, Vec2 p2, Vec2 p3, const RGBA &color);
 
     void _Render();
 
     void _RenderInstance(const Instance &instance, const Matrix &matrixCamera);
-
-    Vec2 _VertexToCanvas(Vec3 vertex);
-
-    Vec3 _VertexToViewport(Vec3 vertex);
-
-    Vec2 _ViewportToCanvas(Vec2 p_viewport);
 
 public:
     Rasterizer();

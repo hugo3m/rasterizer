@@ -51,7 +51,7 @@ vector<int> Rasterizer::Draw() const
     return this->_canvas.Render();
 }
 
-void Rasterizer::_DrawLine(Vec2 from, Vec2 to, RGBA color)
+void Rasterizer::_DrawLine(const Vec2 &from, const Vec2 &to, const RGBA &color)
 {
 
     vector<Vec2> points = InterpolateVec2(from, to);
@@ -61,14 +61,14 @@ void Rasterizer::_DrawLine(Vec2 from, Vec2 to, RGBA color)
     }
 }
 
-void Rasterizer::_DrawTriangleWireframe(Vec2 p1, Vec2 p2, Vec2 p3, RGBA color)
+void Rasterizer::_DrawTriangleWireframe(const Vec2 &p1, const Vec2 &p2, const Vec2 &p3, const RGBA &color)
 {
     this->_DrawLine(p1, p2, color);
     this->_DrawLine(p2, p3, color);
     this->_DrawLine(p3, p1, color);
 }
 
-void Rasterizer::_DrawTriangleFilled(Vec2 p1, Vec2 p2, Vec2 p3, RGBA color)
+void Rasterizer::_DrawTriangleFilled(Vec2 p1, Vec2 p2, Vec2 p3, const RGBA &color)
 {
     // put smallest y in p1 and biggest in p3
     if (p2.y < p1.y)
@@ -113,7 +113,7 @@ void Rasterizer::_DrawTriangleFilled(Vec2 p1, Vec2 p2, Vec2 p3, RGBA color)
     }
 }
 
-void Rasterizer::_DrawTriangleShaded(Vec2 p1, Vec2 p2, Vec2 p3, RGBA color)
+void Rasterizer::_DrawTriangleShaded(Vec2 p1, Vec2 p2, Vec2 p3, const RGBA &color)
 {
     // put smallest y in p1 and biggest in p3
     if (p2.y < p1.y)
@@ -182,25 +182,6 @@ void Rasterizer::_DrawTriangleShaded(Vec2 p1, Vec2 p2, Vec2 p3, RGBA color)
     }
 }
 
-Vec2 Rasterizer::_ViewportToCanvas(Vec2 p_viewport)
-{
-    double width_ratio = (this->_canvas.GetWidthMax() * 2) / this->_viewport.width;
-    double height_ratio = (this->_canvas.GetHeightMax() * 2) / this->_viewport.height;
-    return Vec2(p_viewport.x * width_ratio, p_viewport.y * height_ratio);
-}
-
-Vec3 Rasterizer::_VertexToViewport(Vec3 vertex)
-{
-    double ratio = this->_viewport.depth / vertex.z;
-    return Vec3(vertex.x * ratio, vertex.y * ratio, this->_viewport.depth);
-}
-
-Vec2 Rasterizer::_VertexToCanvas(Vec3 vertex)
-{
-    Vec3 vertex_to_viewport = this->_VertexToViewport(vertex);
-    return this->_ViewportToCanvas(Vec2(vertex_to_viewport.x, vertex_to_viewport.y));
-}
-
 void Rasterizer::_Render()
 {
     Matrix matrixCamera = GenerateMatrixCamera(this->_camera);
@@ -232,13 +213,7 @@ void Rasterizer::_RenderInstance(const Instance &instance, const Matrix &matrixC
             Vec2 fV2 = Vec2(v2->x, v2->y) * (1 / v2->z);
             Vec2 fV3 = Vec2(v3->x, v3->y) * (1 / v3->z);
             this->_DrawTriangleWireframe(fV1, fV2, fV3, RGBA(255, 120, 200, 255));
-            delete v1;
-            delete v2;
-            delete v3;
         }
-        v1Factored.release();
-        v2Factored.release();
-        v3Factored.release();
     }
 };
 

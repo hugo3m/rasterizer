@@ -2,11 +2,11 @@
 #include <stdexcept>
 #include <cmath>
 
-MatrixProxy::MatrixProxy(std::vector<double> &row) : _row(row) {};
+MatrixProxy::MatrixProxy(vector<double> &data, unsigned int row, unsigned int columnLength) : _data(data), _row(row), _columnLength(columnLength) {};
 
 double &MatrixProxy::operator[](unsigned int column)
 {
-    return _row[column];
+    return this->_data[(_row * _columnLength) + column];
 };
 
 Matrix::Matrix(const vector<double> &data, unsigned int rowLength, unsigned int columnLength) : _rowLength(rowLength), _columnLength(columnLength)
@@ -15,14 +15,9 @@ Matrix::Matrix(const vector<double> &data, unsigned int rowLength, unsigned int 
     {
         throw invalid_argument("matrix invalid row and column regarding data size");
     }
-    for (unsigned int i = 0; i < _rowLength; i++)
+    for (unsigned int i = 0; i < (_rowLength * _columnLength); i++)
     {
-        vector<double> temp;
-        for (unsigned int j = 0; j < _columnLength; j++)
-        {
-            temp.push_back(data[(i * _columnLength) + j]);
-        }
-        _data.push_back(temp);
+        _data.push_back(data[i]);
     }
 };
 
@@ -30,44 +25,42 @@ Matrix::Matrix(const Matrix &matrix) : _rowLength(matrix.GetRowLength()), _colum
 {
     for (unsigned int i = 0; i < _rowLength; i++)
     {
-        vector<double> temp;
         for (unsigned int j = 0; j < _columnLength; j++)
         {
-            temp.push_back(matrix.Get(i, j));
+            _data.push_back(matrix.Get(i, j));
         }
-        _data.push_back(temp);
     }
 }
 
 Matrix::Matrix(const Vec2 &vec) : _rowLength(2), _columnLength(1)
 {
-    _data.push_back({vec.x});
-    _data.push_back({vec.y});
+    _data.push_back(vec.x);
+    _data.push_back(vec.y);
 };
 
 Matrix::Matrix(const Vec3 &vec) : _rowLength(3), _columnLength(1)
 {
-    _data.push_back({vec.x});
-    _data.push_back({vec.y});
-    _data.push_back({vec.z});
+    _data.push_back(vec.x);
+    _data.push_back(vec.y);
+    _data.push_back(vec.z);
 };
 
 Matrix::Matrix(const VecHomogenous &vec) : _rowLength(4), _columnLength(1)
 {
-    _data.push_back({vec.x});
-    _data.push_back({vec.y});
-    _data.push_back({vec.z});
-    _data.push_back({vec.w});
+    _data.push_back(vec.x);
+    _data.push_back(vec.y);
+    _data.push_back(vec.z);
+    _data.push_back(vec.w);
 };
 
 MatrixProxy Matrix::operator[](unsigned int row)
 {
-    return MatrixProxy(_data[row]);
+    return MatrixProxy(_data, row, _columnLength);
 }
 
 double Matrix::Get(unsigned int row, unsigned int column) const
 {
-    return this->_data[row][column];
+    return this->_data[(row * _columnLength) + column];
 };
 
 unsigned int Matrix::GetRowLength() const

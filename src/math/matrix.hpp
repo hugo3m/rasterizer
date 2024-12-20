@@ -8,10 +8,12 @@ using namespace std;
 class MatrixProxy
 {
 private:
-    std::vector<double> &_row;
+    vector<double> &_data;
+    unsigned int _row;
+    unsigned int _columnLength;
 
 public:
-    MatrixProxy(std::vector<double> &row);
+    MatrixProxy(vector<double> &data, unsigned int row, unsigned int columnLength);
 
     double &operator[](unsigned int column);
 };
@@ -19,7 +21,7 @@ public:
 class Matrix
 {
 private:
-    vector<vector<double>> _data;
+    vector<double> _data;
     unsigned int _rowLength;
     unsigned int _columnLength;
 
