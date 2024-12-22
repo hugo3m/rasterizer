@@ -10,9 +10,9 @@ using namespace std;
 
 Rasterizer::Rasterizer() : _canvas(Canvas(200, 200)), _viewport({1, 1, 1}), _camera(Transform(Vec3(0, 0, 0), 0, Vec3(0, 0, 0))), _matrixProjection(GenerateMatrixProjection(_canvas, _viewport))
 {
-    // this->_DrawTriangleFilled(Vec2(-70, -70), Vec2(70, -25), Vec2(80, 80), RGBA(255, 0, 0, 255));
-    // this->_DrawTriangleShaded(Vec2(-70, -70), Vec2(70, -25), Vec2(80, 80), RGBA(255, 0, 0, 255));
-    // this->_DrawTriangleWireframe(Vec2(-70, -70), Vec2(70, -25), Vec2(80, 80), RGBA(255, 0, 0, 255));
+    // // this->_DrawTriangleFilled(Vec2(-70, -70), Vec2(70, -25), Vec2(80, 80), RGBA(255, 0, 0, 255));
+    // // this->_DrawTriangleShaded(Vec2(-70, -70), Vec2(70, -25), Vec2(80, 80), RGBA(255, 0, 0, 255));
+    // // this->_DrawTriangleWireframe(Vec2(-70, -70), Vec2(70, -25), Vec2(80, 80), RGBA(255, 0, 0, 255));
 
     // The four "front" vertices
     shared_ptr<Vec3> v1 = make_shared<Vec3>(1, 1, 1);
@@ -207,7 +207,7 @@ void Rasterizer::_RenderInstance(const Instance &instance, const Matrix &matrixC
         Vec3 *v1 = dynamic_cast<Vec3 *>(v1Factored.get());
         Vec3 *v2 = dynamic_cast<Vec3 *>(v2Factored.get());
         Vec3 *v3 = dynamic_cast<Vec3 *>(v3Factored.get());
-        if (v1 && v2 && v3)
+        if (v1 && v2 && v3 && v1->z >= this->_viewport.depth && v2->z >= this->_viewport.depth && v3->z >= this->_viewport.depth)
         {
             Vec2 fV1 = Vec2(v1->x, v1->y) * (1 / v1->z);
             Vec2 fV2 = Vec2(v2->x, v2->y) * (1 / v2->z);
@@ -237,7 +237,6 @@ Matrix GenerateMatrixInstance(const Instance &instance)
     Vec3 translation = transform.GetTranslation();
     Vec3 scale = transform.GetScale();
     Matrix matrixTranslation = Matrix({1, 0, 0, translation.x, 0, 1, 0, translation.y, 0, 0, 1, translation.z, 0, 0, 0, 1}, 4, 4);
-    Matrix matrixScale = Matrix({translation.x, 0, 0, 0, 0, translation.y, 0, 0, 0, 0, translation.z, 0, 0, 0, 0, 1}, 4, 4);
+    Matrix matrixScale = Matrix({scale.x, 0, 0, 0, 0, scale.y, 0, 0, 0, 0, scale.z, 0, 0, 0, 0, 1}, 4, 4);
     return matrixTranslation * matrixScale;
-    // return matrixTranslation;
 }

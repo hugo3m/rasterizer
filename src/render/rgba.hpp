@@ -17,5 +17,9 @@ public:
 
     array<int, 4> Unpack() const;
 
-    RGBA operator*(double const &other) const;
+    RGBA operator*(const double &other) const;
+
+    void Set(const RGBA &rgba);
+
+    void Set(int r, int g, int b, int a);
 };

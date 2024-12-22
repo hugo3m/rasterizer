@@ -19,7 +19,7 @@ export default function Test() {
         for (let i = 0; i < draw.size(); i++){
           array.push(draw.get(i) as number);
         }
-        ctx.putImageData(new ImageData(new Uint8ClampedArray(array), 200, 200), 0, 0);
+        ctx.putImageData(new ImageData(new Uint8ClampedArray(array), 200,  200), 0, 0);
         rasterizer.delete();
       };
       run();

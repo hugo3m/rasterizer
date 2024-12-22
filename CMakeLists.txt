@@ -27,7 +27,6 @@ set(EMCC_ARGS
   -sSINGLE_FILE=1
   -sALLOW_MEMORY_GROWTH=1
   # -sMAXIMUM_MEMORY=4GB
-  --memoryprofiler
   -s -lembind
 )
 
