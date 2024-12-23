@@ -41,3 +41,5 @@ Matrix GenerateMatrixCamera(const Transform &camera);
 Matrix GenerateMatrixProjection(const Canvas &canvas, const Viewport &viewport);
 
 Matrix GenerateMatrixInstance(const Instance &canvas);
+
+Matrix GenerateMatrixRotation(const Rotation &rotation);

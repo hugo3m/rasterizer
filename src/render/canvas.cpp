@@ -46,5 +46,5 @@ void Canvas::SetPixel(int x, int y, int r, int g, int b, int a)
 
 void Canvas::SetPixelFromRGBA(int x, int y, RGBA rgba)
 {
-    this->_pixels[this->_GetPixelFlatIndex(x, y)] = rgba;
+    this->_pixels[this->_GetPixelFlatIndex(x, y)].Set(rgba);
 }
