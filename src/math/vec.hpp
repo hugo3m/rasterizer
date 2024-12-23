@@ -21,6 +21,8 @@ public:
     virtual unsigned int GetLength() const override;
 
     Vec2 operator*(double const &other) const;
+
+    Vec2 operator/(double const &other) const;
 };
 class Vec3 : public Vec2
 {
@@ -30,6 +32,12 @@ public:
     Vec3(double x, double y, double z);
 
     Vec3 operator+(Vec3 const &other) const;
+
+    Vec3 operator/(double const &other) const;
+
+    double Norm() const;
+
+    Vec3 Normalize() const;
 
     virtual unsigned int GetLength() const override;
 };
