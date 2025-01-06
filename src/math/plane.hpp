@@ -11,5 +11,9 @@ private:
 public:
     Plane(Vec3 normal, double d);
 
-    bool IsInFront(Vec3 point) const;
+    Vec3 GetNormal() const;
+
+    double GetD() const;
+
+    bool IsInFront(const Vec3 &point) const;
 };

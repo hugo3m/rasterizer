@@ -4,6 +4,7 @@ SET(SRC_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/transform.cpp
     # math
     ${CMAKE_CURRENT_SOURCE_DIR}/math/matrix.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/math/plane.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/math/triangle.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/math/utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/math/vec.cpp
