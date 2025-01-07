@@ -195,8 +195,7 @@ void Rasterizer::_Render()
 void Rasterizer::_RenderInstance(const Instance &instance, const Matrix &matrixCamera)
 {
     Vec3 position = instance.GetTransform().GetTranslation();
-    Matrix matrixInstance = GenerateMatrixInstance(instance);
-    Matrix matrixFactor = this->_matrixProjection * matrixCamera * matrixInstance;
+    Matrix matrixFactor = this->_matrixProjection * matrixCamera * instance.GenerateMatrixInstance();
     for (auto triangle : instance.GetModel()->GetTriangles())
     {
         array<shared_ptr<Vec3>, 3> vertices = triangle->GetVertices();
@@ -223,39 +222,4 @@ Matrix GenerateMatrixProjection(const Canvas &canvas, const Viewport &viewport)
     double widthRatio = (viewport.depth * canvas.GetWidthMax() * 2) / viewport.width;
     double heightRatio = (viewport.depth * canvas.GetHeightMax() * 2) / viewport.height;
     return Matrix({widthRatio, 0, 0, 0, 0, heightRatio, 0, 0, 0, 0, 1, 0}, 3, 4);
-}
-
-Matrix GenerateMatrixInstance(const Instance &instance)
-{
-    Transform transform = instance.GetTransform();
-    Vec3 translation = transform.GetTranslation();
-    Vec3 scale = transform.GetScale();
-    Matrix matrixTranslation = Matrix({1, 0, 0, translation.x, 0, 1, 0, translation.y, 0, 0, 1, translation.z, 0, 0, 0, 1}, 4, 4);
-    Matrix matrixScale = Matrix({scale.x, 0, 0, 0, 0, scale.y, 0, 0, 0, 0, scale.z, 0, 0, 0, 0, 1}, 4, 4);
-    return matrixTranslation * matrixScale * GenerateMatrixRotation(transform.GetRotation());
-}
-
-Matrix GenerateMatrixRotation(const Rotation &rotation)
-{
-    double yaw = rotation.yaw;
-    double pitch = rotation.pitch;
-    double roll = rotation.roll;
-
-    return Matrix({cos(yaw) * cos(pitch),
-                   (cos(yaw) * sin(pitch) * sin(roll)) - (sin(yaw) * cos(roll)),
-                   (cos(yaw) * sin(pitch) * cos(roll)) + (sin(yaw) * sin(roll)),
-                   0,
-                   sin(yaw) * cos(pitch),
-                   (sin(yaw) * sin(pitch) * sin(roll)) + (cos(yaw) * cos(roll)),
-                   (sin(yaw) * sin(pitch) * cos(roll)) - (cos(yaw) * sin(roll)),
-                   0,
-                   -sin(pitch),
-                   cos(pitch) * sin(roll),
-                   cos(pitch) * cos(roll),
-                   0,
-                   0,
-                   0,
-                   0,
-                   1},
-                  4, 4);
 }

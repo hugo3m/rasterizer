@@ -2,6 +2,7 @@ SET(SRC_FILES
     # instances
     ${CMAKE_CURRENT_SOURCE_DIR}/instances/camera.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/instances/instance.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/instances/rotation.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/instances/transform.cpp
     # math
     ${CMAKE_CURRENT_SOURCE_DIR}/math/matrix.cpp

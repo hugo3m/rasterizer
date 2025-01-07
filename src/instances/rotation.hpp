@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../math/matrix.hpp"
+
 class Rotation
 {
 public:
@@ -8,4 +10,6 @@ public:
     double roll;
 
     Rotation(double yaw, double pitch, double roll) : yaw(yaw), pitch(pitch), roll(roll) {};
+
+    Matrix GenerateMatrixRotation() const;
 };

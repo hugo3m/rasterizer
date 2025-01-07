@@ -39,8 +39,4 @@ public:
 
 Matrix GenerateMatrixProjection(const Canvas &canvas, const Viewport &viewport);
 
-Matrix GenerateMatrixInstance(const Instance &canvas);
-
-Matrix GenerateMatrixRotation(const Rotation &rotation);
-
 vector<Instance> ClipInstances(const vector<Instance> &instances);

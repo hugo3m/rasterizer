@@ -3,6 +3,7 @@
 #include <memory>
 #include "../meshes/model.hpp"
 #include "../math/vec.hpp"
+#include "../math/matrix.hpp"
 #include "transform.hpp"
 
 using namespace std;
@@ -17,4 +18,5 @@ public:
     Instance(shared_ptr<Model> model, Transform transform);
     shared_ptr<Model> GetModel() const;
     Transform GetTransform() const;
+    Matrix GenerateMatrixInstance() const;
 };
