@@ -1,16 +1,17 @@
 SET(SRC_FILES
-    # root
-    ${CMAKE_CURRENT_SOURCE_DIR}/instance.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/transform.cpp
+    # instances
+    ${CMAKE_CURRENT_SOURCE_DIR}/instances/camera.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/instances/instance.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/instances/transform.cpp
     # math
     ${CMAKE_CURRENT_SOURCE_DIR}/math/matrix.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/math/plane.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/math/triangle.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/math/utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/math/vec.cpp
-    # models
-    ${CMAKE_CURRENT_SOURCE_DIR}/models/cube.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/models/triangle.cpp
+    # meshes
+    ${CMAKE_CURRENT_SOURCE_DIR}/meshes/cube.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/meshes/triangle.cpp
     # render
     ${CMAKE_CURRENT_SOURCE_DIR}/render/rgba.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/render/canvas.cpp

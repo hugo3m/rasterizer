@@ -1,8 +1,8 @@
 #pragma once
 
 #include <memory>
-#include "models/model.hpp"
-#include "math/vec.hpp"
+#include "../meshes/model.hpp"
+#include "../math/vec.hpp"
 #include "transform.hpp"
 
 using namespace std;

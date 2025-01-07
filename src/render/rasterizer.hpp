@@ -4,17 +4,18 @@
 
 #include "canvas.hpp"
 #include "viewport.hpp"
-#include "../instance.hpp"
+#include "../instances/instance.hpp"
 #include "../math/vec.hpp"
 #include "../math/matrix.hpp"
+#include "../instances/camera.hpp"
 
 class Rasterizer
 {
 private:
     Canvas _canvas;
+    Camera _camera;
+
     vector<Instance> _instances;
-    Viewport _viewport;
-    Transform _camera;
 
     Matrix _matrixProjection;
 
@@ -36,10 +37,10 @@ public:
     vector<int> Draw() const;
 };
 
-Matrix GenerateMatrixCamera(const Transform &camera);
-
 Matrix GenerateMatrixProjection(const Canvas &canvas, const Viewport &viewport);
 
 Matrix GenerateMatrixInstance(const Instance &canvas);
 
 Matrix GenerateMatrixRotation(const Rotation &rotation);
+
+vector<Instance> ClipInstances(const vector<Instance> &instances);

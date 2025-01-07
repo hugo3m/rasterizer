@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include "math/vec.hpp"
+#include "../math/vec.hpp"
 #include "rotation.hpp"
 
 using namespace std;

@@ -12,8 +12,14 @@ public:
     Vec(double x);
 
     virtual unsigned int GetLength() const;
+
     virtual ~Vec();
+
     virtual bool operator==(const Vec &other) const;
+
+    virtual Vec operator-(const Vec &other) const;
+
+    Vec operator*(double const &other) const;
 };
 class Vec2 : public Vec
 {
@@ -24,11 +30,13 @@ public:
 
     virtual unsigned int GetLength() const override;
 
-    Vec2 operator*(double const &other) const;
-
     Vec2 operator/(double const &other) const;
 
     virtual bool operator==(const Vec2 &other) const;
+
+    virtual Vec2 operator-(const Vec2 &other) const;
+
+    Vec2 operator*(double const &other) const;
 };
 class Vec3 : public Vec2
 {
@@ -37,7 +45,7 @@ public:
 
     Vec3(double x, double y, double z);
 
-    Vec3 operator+(Vec3 const &other) const;
+    Vec3 operator+(const Vec3 &other) const;
 
     Vec3 operator/(double const &other) const;
 
@@ -50,6 +58,10 @@ public:
     virtual unsigned int GetLength() const override;
 
     virtual bool operator==(const Vec3 &other) const;
+
+    virtual Vec3 operator-(const Vec3 &other) const;
+
+    Vec3 operator*(double const &other) const;
 };
 
 class VecHomogenous : public Vec3

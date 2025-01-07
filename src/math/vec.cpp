@@ -17,6 +17,16 @@ unsigned int Vec::GetLength() const
     return 1;
 }
 
+Vec Vec::operator-(const Vec &other) const
+{
+    return Vec(this->x - other.x);
+}
+
+Vec Vec::operator*(double const &other) const
+{
+    return Vec(this->x * other);
+}
+
 // **** Vec2 ****
 
 Vec2::Vec2(double x, double y) : Vec(x), y(y) {};
@@ -41,6 +51,11 @@ bool Vec2::operator==(const Vec2 &other) const
     return this->x == other.x && this->y == other.y;
 }
 
+Vec2 Vec2::operator-(const Vec2 &other) const
+{
+    return Vec2(this->x - other.x, this->y - other.y);
+}
+
 // **** Vec3 ****
 
 Vec3::Vec3(double x, double y, double z) : Vec2(x, y), z(z) {};
@@ -59,6 +74,16 @@ bool Vec3::operator==(const Vec3 &other) const
 {
     return this->x == other.x && this->y == other.y && this->z == other.z;
 };
+
+Vec3 Vec3::operator-(const Vec3 &other) const
+{
+    return Vec3(this->x - other.x, this->y - other.y, this->z - other.z);
+};
+
+Vec3 Vec3::operator*(double const &other) const
+{
+    return Vec3(this->x * other, this->y * other, this->z * other);
+}
 
 // **** VecHomogenous ****
 

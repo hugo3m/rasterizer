@@ -1,14 +1,15 @@
 #include <memory>
 
 #include "rasterizer.hpp"
-#include "../transform.hpp"
+#include "../instances/transform.hpp"
 #include "../math/utils.hpp"
 #include "../math/triangle.hpp"
-#include "../models/cube.hpp"
+#include "../math/plane.hpp"
+#include "../meshes/cube.hpp"
 
 using namespace std;
 
-Rasterizer::Rasterizer() : _canvas(Canvas(200, 200)), _viewport({1, 1, 1}), _camera(Transform(Vec3(0, 0, 0), Rotation(0, 0, 0), Vec3(0, 0, 0))), _matrixProjection(GenerateMatrixProjection(_canvas, _viewport))
+Rasterizer::Rasterizer() : _canvas(Canvas(200, 200)), _camera(Camera({1, 1, 1}, Transform(Vec3(0, 0, 0), Rotation(0, 0, 0), Vec3(0, 0, 0)))), _matrixProjection(GenerateMatrixProjection(_canvas, _camera.GetViewport()))
 {
     // // this->_DrawTriangleFilled(Vec2(-70, -70), Vec2(70, -25), Vec2(80, 80), RGBA(255, 0, 0, 255));
     // // this->_DrawTriangleShaded(Vec2(-70, -70), Vec2(70, -25), Vec2(80, 80), RGBA(255, 0, 0, 255));
@@ -184,7 +185,7 @@ void Rasterizer::_DrawTriangleShaded(Vec2 p1, Vec2 p2, Vec2 p3, const RGBA &colo
 
 void Rasterizer::_Render()
 {
-    Matrix matrixCamera = GenerateMatrixCamera(this->_camera);
+    Matrix matrixCamera = this->_camera.GenerateMatrixCamera();
     for (const Instance &instance : this->_instances)
     {
         this->_RenderInstance(instance, matrixCamera);
@@ -207,7 +208,7 @@ void Rasterizer::_RenderInstance(const Instance &instance, const Matrix &matrixC
         Vec3 *v1 = dynamic_cast<Vec3 *>(v1Factored.get());
         Vec3 *v2 = dynamic_cast<Vec3 *>(v2Factored.get());
         Vec3 *v3 = dynamic_cast<Vec3 *>(v3Factored.get());
-        if (v1 && v2 && v3 && v1->z >= this->_viewport.depth && v2->z >= this->_viewport.depth && v3->z >= this->_viewport.depth)
+        if (v1 && v2 && v3)
         {
             Vec2 fV1 = Vec2(v1->x, v1->y) * (1 / v1->z);
             Vec2 fV2 = Vec2(v2->x, v2->y) * (1 / v2->z);
@@ -216,13 +217,6 @@ void Rasterizer::_RenderInstance(const Instance &instance, const Matrix &matrixC
         }
     }
 };
-
-Matrix GenerateMatrixCamera(const Transform &camera)
-{
-    Vec3 translation = camera.GetTranslation();
-    Matrix translationMatrix = Matrix({1, 0, 0, translation.x, 0, 1, 0, translation.y, 0, 0, 1, translation.z, 0, 0, 0, 1}, 4, 4);
-    return translationMatrix.Inverse();
-}
 
 Matrix GenerateMatrixProjection(const Canvas &canvas, const Viewport &viewport)
 {
