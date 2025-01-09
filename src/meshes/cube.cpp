@@ -18,3 +18,27 @@ vector<shared_ptr<Triangle>> CubeModel::GetTriangles() const
 
     return vector<shared_ptr<Triangle>>(begin(this->_triangles), end(this->_triangles));
 }
+
+vector<shared_ptr<Vec3>> CubeModel::GetUniqueVertices() const
+{
+    vector<shared_ptr<Vec3>> res;
+    for (const auto triangle : this->GetTriangles())
+    {
+        for (const auto vertice : triangle->GetVertices())
+        {
+            bool isIn = false;
+            for (const auto addedVertice : res)
+            {
+                if ((*addedVertice) == (*vertice))
+                {
+                    isIn = true;
+                }
+            }
+            if (!isIn)
+            {
+                res.push_back(vertice);
+            }
+        }
+    }
+    return res;
+}

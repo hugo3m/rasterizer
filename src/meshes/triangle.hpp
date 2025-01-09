@@ -17,4 +17,6 @@ public:
     TriangleModel(shared_ptr<Triangle> t);
 
     vector<shared_ptr<Triangle>> GetTriangles() const;
+
+    vector<shared_ptr<Vec3>> GetUniqueVertices() const;
 };

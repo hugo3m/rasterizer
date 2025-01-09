@@ -7,11 +7,13 @@ SET(SRC_FILES
     # math
     ${CMAKE_CURRENT_SOURCE_DIR}/math/matrix.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/math/plane.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/math/sphere.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/math/triangle.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/math/utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/math/vec.cpp
     # meshes
     ${CMAKE_CURRENT_SOURCE_DIR}/meshes/cube.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/meshes/model.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/meshes/triangle.cpp
     # render
     ${CMAKE_CURRENT_SOURCE_DIR}/render/rgba.cpp

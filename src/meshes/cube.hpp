@@ -25,4 +25,6 @@ public:
               shared_ptr<Triangle> t12);
 
     vector<shared_ptr<Triangle>> GetTriangles() const;
+
+    vector<shared_ptr<Vec3>> GetUniqueVertices() const;
 };
