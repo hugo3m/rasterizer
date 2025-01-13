@@ -245,7 +245,6 @@ optional<Instance> ClipInstanceAgainstPlanes(const Instance &instance, const arr
     Instance res = instance;
     for (const auto clipPlane : clipPlanes)
     {
-        printf("triangles number: %d \n", res.GetMesh()->GetTriangles().size());
         optional<Instance> optInstance = ClipInstanceAgainstPlane(res, clipPlane);
         if (!optInstance)
         {
@@ -261,9 +260,7 @@ optional<Instance> ClipInstanceAgainstPlane(const Instance &instance, const Plan
     Sphere boundingSphere = instance.GetBoundingSphere();
     double radius = boundingSphere.GetRadius();
     Vec3 center = boundingSphere.GetCenter();
-    printf("center: x=%lf, y=%lf, z=%lf\n", center.x, center.y, center.z);
     double signedDistance = clipPlane.SignedDist(boundingSphere.GetCenter());
-    printf("signed distance = %lf \n", signedDistance);
     if (signedDistance > radius)
     {
         return instance;
