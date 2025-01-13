@@ -1,6 +1,6 @@
-#include "model.hpp"
+#include "mesh.hpp"
 
-Sphere Model::GetBoundingSphere() const
+Sphere Mesh::GetBoundingSphere() const
 {
     Vec3 center = Vec3(0, 0, 0);
     double radius = 0;

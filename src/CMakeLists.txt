@@ -13,7 +13,8 @@ SET(SRC_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/math/vec.cpp
     # meshes
     ${CMAKE_CURRENT_SOURCE_DIR}/meshes/cube.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/meshes/model.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/meshes/custom.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/meshes/mesh.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/meshes/triangle.cpp
     # render
     ${CMAKE_CURRENT_SOURCE_DIR}/render/rgba.cpp

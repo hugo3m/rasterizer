@@ -1,9 +1,6 @@
 #include "camera.hpp"
 
-Camera::Camera(Viewport viewport, Transform transform) : _viewport(viewport), _transform(transform), _clippingPlanes(GenerateClippingPlanes())
-{
-    GenerateClippingPlanes();
-};
+Camera::Camera(Viewport viewport, Transform transform) : _viewport(viewport), _transform(transform), _clippingPlanes(GenerateClippingPlanes()) {};
 
 array<Plane, 5> Camera::GenerateClippingPlanes() const
 {

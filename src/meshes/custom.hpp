@@ -1,20 +1,17 @@
+
 #pragma once
 
-#include <array>
 #include <memory>
-#include "mesh.hpp"
-#include "../math/vec.hpp"
 #include "../math/triangle.hpp"
+#include "mesh.hpp"
 
-using namespace std;
-
-class TriangleMesh : public Mesh
+class CustomMesh : public Mesh
 {
 private:
-    shared_ptr<Triangle> _triangle;
+    vector<shared_ptr<Triangle>> _triangles;
 
 public:
-    TriangleMesh(shared_ptr<Triangle> t);
+    CustomMesh(vector<shared_ptr<Triangle>> triangles);
 
     vector<shared_ptr<Triangle>> GetTriangles() const;
 

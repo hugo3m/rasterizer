@@ -1,10 +1,10 @@
 #include "instance.hpp"
 
-Instance::Instance(shared_ptr<Model> model, Transform transform) : _model(model), _transform(transform) {};
+Instance::Instance(shared_ptr<Mesh> mesh, Transform transform) : _mesh(mesh), _transform(transform) {};
 
-shared_ptr<Model> Instance::GetModel() const
+shared_ptr<Mesh> Instance::GetMesh() const
 {
-    return this->_model;
+    return this->_mesh;
 };
 
 Transform Instance::GetTransform() const

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <optional>
 
 #include "canvas.hpp"
 #include "viewport.hpp"
@@ -8,6 +9,8 @@
 #include "../math/vec.hpp"
 #include "../math/matrix.hpp"
 #include "../instances/camera.hpp"
+
+using namespace std;
 
 class Rasterizer
 {
@@ -39,4 +42,12 @@ public:
 
 Matrix GenerateMatrixProjection(const Canvas &canvas, const Viewport &viewport);
 
-vector<Instance> ClipInstances(const vector<Instance> &instances);
+vector<Instance> ClipInstancesAgainstPlanes(const vector<Instance> &instances, const array<Plane, 5> &clipPlanes);
+
+optional<Instance> ClipInstanceAgainstPlanes(const Instance &instance, const array<Plane, 5> &clipPlanes);
+
+optional<Instance> ClipInstanceAgainstPlane(const Instance &instance, const Plane &clipPlane);
+
+vector<shared_ptr<Triangle>> ClipTrianglesAgainstPlane(const vector<shared_ptr<Triangle>> &triangles, const Plane &clipPlane);
+
+vector<shared_ptr<Triangle>> ClipTriangleAgainstPlane(const shared_ptr<Triangle> &triangle, const Plane &clipPlane);

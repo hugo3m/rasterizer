@@ -13,7 +13,7 @@ TEST(CubeTest, GetBoundingCirlce)
     shared_ptr<Vec3> v6 = make_shared<Vec3>(1, 0, 1);
     shared_ptr<Vec3> v7 = make_shared<Vec3>(0, 1, 1);
     shared_ptr<Vec3> v8 = make_shared<Vec3>(1, 1, 1);
-    // the triangle model
+    // the triangle mesh
     shared_ptr<Triangle> t1 = make_shared<Triangle>(v1, v2, v3);
     shared_ptr<Triangle> t2 = make_shared<Triangle>(v1, v3, v4);
     shared_ptr<Triangle> t3 = make_shared<Triangle>(v5, v1, v2);
@@ -26,8 +26,8 @@ TEST(CubeTest, GetBoundingCirlce)
     shared_ptr<Triangle> t10 = make_shared<Triangle>(v5, v2, v1);
     shared_ptr<Triangle> t11 = make_shared<Triangle>(v3, v7, v8);
     shared_ptr<Triangle> t12 = make_shared<Triangle>(v3, v8, v4);
-    // the cube model
-    CubeModel c1 = CubeModel(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12);
+    // the cube mesh
+    CubeMesh c1 = CubeMesh(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12);
 
     Sphere boundingSphere = c1.GetBoundingSphere();
     EXPECT_TRUE(boundingSphere.GetCenter() == Vec3(0.5, 0.5, 0.5));

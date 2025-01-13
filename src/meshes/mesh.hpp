@@ -4,7 +4,7 @@
 #include "../math/sphere.hpp"
 #include "../math/triangle.hpp"
 
-class Model
+class Mesh
 {
 public:
     virtual vector<shared_ptr<Triangle>> GetTriangles() const = 0;

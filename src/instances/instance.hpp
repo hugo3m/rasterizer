@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include "../meshes/model.hpp"
+#include "../meshes/mesh.hpp"
 #include "../math/vec.hpp"
 #include "../math/matrix.hpp"
 #include "transform.hpp"
@@ -11,12 +11,12 @@ using namespace std;
 class Instance
 {
 private:
-    shared_ptr<Model> _model;
+    shared_ptr<Mesh> _mesh;
     Transform _transform;
 
 public:
-    Instance(shared_ptr<Model> model, Transform transform);
-    shared_ptr<Model> GetModel() const;
+    Instance(shared_ptr<Mesh> mesh, Transform transform);
+    shared_ptr<Mesh> GetMesh() const;
     Transform GetTransform() const;
     Matrix GenerateMatrixInstance() const;
 };
