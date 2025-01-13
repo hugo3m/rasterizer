@@ -16,7 +16,12 @@ private:
 
 public:
     Instance(shared_ptr<Mesh> mesh, Transform transform);
+
     shared_ptr<Mesh> GetMesh() const;
+
     Transform GetTransform() const;
+
     Matrix GenerateMatrixInstance() const;
+
+    Sphere GetBoundingSphere() const;
 };

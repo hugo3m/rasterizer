@@ -20,3 +20,13 @@ Matrix Instance::GenerateMatrixInstance() const
     Matrix matrixScale = Matrix({scale.x, 0, 0, 0, 0, scale.y, 0, 0, 0, 0, scale.z, 0, 0, 0, 0, 1}, 4, 4);
     return matrixTranslation * matrixScale * this->_transform.GetRotation().GenerateMatrixRotation();
 }
+
+Sphere Instance::GetBoundingSphere() const
+{
+    Sphere meshBoundingSphere = this->GetMesh()->GetBoundingSphere();
+    Transform transform = this->GetTransform();
+    Vec3 translate = transform.GetTranslation();
+    Vec3 scale = transform.GetScale();
+    double maxScale = max(scale.x, max(scale.y, scale.z));
+    return Sphere(meshBoundingSphere.GetCenter() + translate, maxScale * meshBoundingSphere.GetRadius());
+}

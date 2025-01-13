@@ -42,8 +42,8 @@ Rasterizer::Rasterizer() : _canvas(Canvas(200, 200)), _camera(Camera({1, 1, 1}, 
     // the cube mesh
     shared_ptr<CubeMesh> c1 = make_shared<CubeMesh>(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12);
     // the cube instance
-    this->_instances.push_back(Instance(c1, Transform(Vec3(-1.5, 0, 7), Rotation(0, 0, 0), Vec3(1, 1, 1))));
-    this->_instances.push_back(Instance(c1, Transform(Vec3(1, 0, 10), Rotation(0, 0, 45), Vec3(2, 2, 2))));
+    // this->_instances.push_back(Instance(c1, Transform(Vec3(-1.5, 0, 7), Rotation(0, 0, 0), Vec3(1, 1, 1))));
+    this->_instances.push_back(Instance(c1, Transform(Vec3(0, 0, 10), Rotation(0, 0, 0), Vec3(1, 1, 1))));
 
     this->_Render();
 }
@@ -245,7 +245,8 @@ optional<Instance> ClipInstanceAgainstPlanes(const Instance &instance, const arr
     Instance res = instance;
     for (const auto clipPlane : clipPlanes)
     {
-        optional<Instance> optInstance = ClipInstanceAgainstPlane(instance, clipPlane);
+        printf("triangles number: %d \n", res.GetMesh()->GetTriangles().size());
+        optional<Instance> optInstance = ClipInstanceAgainstPlane(res, clipPlane);
         if (!optInstance)
         {
             return {};
@@ -257,9 +258,12 @@ optional<Instance> ClipInstanceAgainstPlanes(const Instance &instance, const arr
 
 optional<Instance> ClipInstanceAgainstPlane(const Instance &instance, const Plane &clipPlane)
 {
-    Sphere boundingSphere = instance.GetMesh()->GetBoundingSphere();
+    Sphere boundingSphere = instance.GetBoundingSphere();
     double radius = boundingSphere.GetRadius();
+    Vec3 center = boundingSphere.GetCenter();
+    printf("center: x=%lf, y=%lf, z=%lf\n", center.x, center.y, center.z);
     double signedDistance = clipPlane.SignedDist(boundingSphere.GetCenter());
+    printf("signed distance = %lf \n", signedDistance);
     if (signedDistance > radius)
     {
         return instance;
