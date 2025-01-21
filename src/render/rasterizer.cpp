@@ -27,23 +27,32 @@ Rasterizer::Rasterizer() : _canvas(Canvas(200, 200)), _camera(Camera({1, 1, 1}, 
     shared_ptr<Vec3> v7 = make_shared<Vec3>(-1, -1, -1);
     shared_ptr<Vec3> v8 = make_shared<Vec3>(1, -1, -1);
     // the triangle mesh
+    // back
     shared_ptr<Triangle> t1 = make_shared<Triangle>(v1, v2, v3);
-    shared_ptr<Triangle> t2 = make_shared<Triangle>(v1, v3, v4);
-    shared_ptr<Triangle> t3 = make_shared<Triangle>(v5, v1, v2);
-    shared_ptr<Triangle> t4 = make_shared<Triangle>(v5, v4, v8);
-    shared_ptr<Triangle> t5 = make_shared<Triangle>(v6, v5, v8);
-    shared_ptr<Triangle> t6 = make_shared<Triangle>(v6, v8, v7);
-    shared_ptr<Triangle> t7 = make_shared<Triangle>(v2, v6, v7);
-    shared_ptr<Triangle> t8 = make_shared<Triangle>(v2, v7, v3);
-    shared_ptr<Triangle> t9 = make_shared<Triangle>(v5, v6, v2);
-    shared_ptr<Triangle> t10 = make_shared<Triangle>(v5, v2, v1);
-    shared_ptr<Triangle> t11 = make_shared<Triangle>(v3, v7, v8);
-    shared_ptr<Triangle> t12 = make_shared<Triangle>(v3, v8, v4);
+    shared_ptr<Triangle> t2 = make_shared<Triangle>(v2, v3, v4);
+    // down
+    shared_ptr<Triangle> t3 = make_shared<Triangle>(v3, v4, v8);
+    shared_ptr<Triangle> t4 = make_shared<Triangle>(v3, v7, v4);
+    // up
+    shared_ptr<Triangle> t5 = make_shared<Triangle>(v1, v2, v5);
+    shared_ptr<Triangle> t6 = make_shared<Triangle>(v5, v6, v2);
+    // left
+    shared_ptr<Triangle> t7 = make_shared<Triangle>(v2, v3, v6);
+    shared_ptr<Triangle> t8 = make_shared<Triangle>(v3, v6, v7);
+    // right
+    shared_ptr<Triangle> t9 = make_shared<Triangle>(v1, v4, v5);
+    shared_ptr<Triangle> t10 = make_shared<Triangle>(v4, v5, v8);
+    // front
+    shared_ptr<Triangle> t11 = make_shared<Triangle>(v5, v6, v7);
+    shared_ptr<Triangle> t12 = make_shared<Triangle>(v5, v7, v8);
     // the cube mesh
     shared_ptr<CubeMesh> c1 = make_shared<CubeMesh>(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12);
     // the cube instance
     // this->_instances.push_back(Instance(c1, Transform(Vec3(-1.5, 0, 7), Rotation(0, 0, 0), Vec3(1, 1, 1))));
-    this->_instances.push_back(Instance(c1, Transform(Vec3(0, 0, 10), Rotation(0, 0, 0), Vec3(1, 1, 1))));
+    this->_instances.push_back(Instance(c1, Transform(Vec3(0, 0, 5), Rotation(0, 20, 0), Vec3(1, 1, 1))));
+
+    // this->_DrawTriangleFilled(Vec3(-5, -1, 9), Vec3(0, -1, 9), Vec3(0, 1, 9), RGBA(0, 255, 0, 255));
+    // this->_DrawTriangleFilled(Vec3(-5, 0, 10), Vec3(0, 0, 10), Vec3(7, 5, 15), RGBA(255, 0, 0, 255));
 
     this->_Render();
 }
@@ -63,6 +72,60 @@ void Rasterizer::_DrawLine(const Vec2 &from, const Vec2 &to, const RGBA &color)
     }
 }
 
+void Rasterizer::_DrawLine(Vec3 from, Vec3 to, RGBA color, const Matrix &matrixProjection)
+{
+    // retrieve projected point
+    unique_ptr<Vec> fromFactored = matrixProjection * VecHomogenous(from.x, from.y, from.z, 1);
+    unique_ptr<Vec> toFactored = matrixProjection * VecHomogenous(to.x, to.y, to.z, 1);
+    // cast to vec3
+    Vec3 *fromProjected = dynamic_cast<Vec3 *>(fromFactored.get());
+    Vec3 *toProjected = dynamic_cast<Vec3 *>(toFactored.get());
+    // apply to vec2
+    Vec2 fromVec2 = Vec2(fromProjected->x, fromProjected->y) * (1 / fromProjected->z);
+    Vec2 toVec2 = Vec2(toProjected->x, toProjected->y) * (1 / toProjected->z);
+    // interpolate zs for every sides
+    vector<double> zFromTo;
+    // InterpLinear(1 / v1.z, 1 / v2.z, xs12.size());
+    // if line horizontal-ish
+    if (abs(toVec2.x - fromVec2.x) > abs(toVec2.y - fromVec2.y))
+    {
+        if (fromVec2.x > toVec2.x)
+        {
+            swap(from, to);
+            swap(fromVec2, toVec2);
+        }
+        // y = ax + b
+        double a = (toVec2.y - fromVec2.y) / (toVec2.x - fromVec2.x);
+        double y = fromVec2.y;
+        zFromTo = InterpLinear(1 / from.z, 1 / to.z, toVec2.x - fromVec2.x);
+        for (int x = fromVec2.x; x <= toVec2.x; x++)
+        {
+            this->_canvas.SetPixelFromRGBA(x, y, zFromTo[x - fromVec2.x], color);
+            // y(n+1) = y(n) + a
+            y += a;
+        }
+    }
+    // else line vertical-ish
+    else
+    {
+        if (fromVec2.y > toVec2.y)
+        {
+            swap(from, to);
+            swap(fromVec2, toVec2);
+        }
+        // x = ay + b
+        double a = (toVec2.x - fromVec2.x) / (toVec2.y - fromVec2.y);
+        double x = fromVec2.x;
+        zFromTo = InterpLinear(1 / from.z, 1 / to.z, toVec2.y - fromVec2.y);
+        for (int y = fromVec2.y; y <= toVec2.y; y++)
+        {
+            this->_canvas.SetPixelFromRGBA(x, y, zFromTo[x - fromVec2.x], color);
+            // x(n+1) = x(n) + a
+            x += a;
+        }
+    }
+}
+
 void Rasterizer::_DrawTriangleWireframe(const Vec2 &p1, const Vec2 &p2, const Vec2 &p3, const RGBA &color)
 {
     this->_DrawLine(p1, p2, color);
@@ -70,24 +133,37 @@ void Rasterizer::_DrawTriangleWireframe(const Vec2 &p1, const Vec2 &p2, const Ve
     this->_DrawLine(p3, p1, color);
 }
 
+void Rasterizer::_DrawTriangleWireframe(const Vec3 &p1, const Vec3 &p2, const Vec3 &p3, const RGBA &color, const Matrix &matrixProjection)
+{
+    this->_DrawLine(p1, p2, color, matrixProjection);
+    this->_DrawLine(p2, p3, color, matrixProjection);
+    this->_DrawLine(p3, p1, color, matrixProjection);
+};
+
 void Rasterizer::_DrawTriangleFilled(Vec2 p1, Vec2 p2, Vec2 p3, const RGBA &color)
 {
     // put smallest y in p1 and biggest in p3
     if (p2.y < p1.y)
+    {
         std::swap(p1, p2);
+    }
     if (p3.y < p1.y)
+    {
         std::swap(p1, p3);
+    }
     if (p3.y < p2.y)
+    {
         std::swap(p2, p3);
+    }
     // interpolate xs for every sides
     vector<double> xs12 = InterpLinear(p1.x, p2.x, p2.y - p1.y);
     vector<double> xs13 = InterpLinear(p1.x, p3.x, p3.y - p1.y);
     vector<double> xs23 = InterpLinear(p2.x, p3.x, p3.y - p2.y);
-    // merge small sides together
+    // merge small sides together for xs
     vector<double> xs1223;
     xs1223.insert(xs1223.end(), xs12.begin(), xs12.end() - 1);
     xs1223.insert(xs1223.end(), xs23.begin(), xs23.end());
-    // find left and right side
+    // find left and right side xs and zs
     vector<double> xsLeft;
     vector<double> xsRight;
     int middle = std::floor(xs1223.size() / 2);
@@ -104,13 +180,99 @@ void Rasterizer::_DrawTriangleFilled(Vec2 p1, Vec2 p2, Vec2 p3, const RGBA &colo
     // for every y from bottom to top
     for (int y = p1.y; y < p3.y; y++)
     {
-        // retrieve left, right side
+        // retrieve left, right side for xs
         int xLeft = xsLeft[y - p1.y];
         int xRight = xsRight[y - p1.y];
         // draw a line from left to right
         for (int x = xLeft; x <= xRight; x++)
         {
             this->_canvas.SetPixelFromRGBA(x, y, color);
+        }
+    }
+}
+
+void Rasterizer::_DrawTriangleFilled(Vec3 v1, Vec3 v2, Vec3 v3, const RGBA &color, const Matrix &matrixProjection)
+{
+    // retrieve projected point
+    unique_ptr<Vec> p1Factored = matrixProjection * VecHomogenous(v1.x, v1.y, v1.z, 1);
+    unique_ptr<Vec> p2Factored = matrixProjection * VecHomogenous(v2.x, v2.y, v2.z, 1);
+    unique_ptr<Vec> p3Factored = matrixProjection * VecHomogenous(v3.x, v3.y, v3.z, 1);
+    // cast to vec3
+    Vec3 *p1Vec3 = dynamic_cast<Vec3 *>(p1Factored.get());
+    Vec3 *p2Vec3 = dynamic_cast<Vec3 *>(p2Factored.get());
+    Vec3 *p3Vec3 = dynamic_cast<Vec3 *>(p3Factored.get());
+    // apply to vec2
+    Vec2 p1 = Vec2(p1Vec3->x, p1Vec3->y) * (1 / p1Vec3->z);
+    Vec2 p2 = Vec2(p2Vec3->x, p2Vec3->y) * (1 / p2Vec3->z);
+    Vec2 p3 = Vec2(p3Vec3->x, p3Vec3->y) * (1 / p3Vec3->z);
+    // put smallest y in p1 and biggest in p3
+    if (p2.y < p1.y)
+    {
+        std::swap(p1, p2);
+        std::swap(v1, v2);
+    }
+    if (p3.y < p1.y)
+    {
+        std::swap(p1, p3);
+        std::swap(v1, v3);
+    }
+    if (p3.y < p2.y)
+    {
+        std::swap(p2, p3);
+        std::swap(v2, v3);
+    }
+    // interpolate xs for every sides
+    vector<double> xs12 = InterpLinear(p1.x, p2.x, p2.y - p1.y);
+    vector<double> xs13 = InterpLinear(p1.x, p3.x, p3.y - p1.y);
+    vector<double> xs23 = InterpLinear(p2.x, p3.x, p3.y - p2.y);
+    // interpolate zs for every sides
+    vector<double> zs12 = InterpLinear(1 / v1.z, 1 / v2.z, xs12.size());
+    vector<double> zs13 = InterpLinear(1 / v1.z, 1 / v3.z, xs13.size());
+    vector<double> zs23 = InterpLinear(1 / v2.z, 1 / v3.z, xs23.size());
+    // merge small sides together for xs
+    vector<double> xs1223;
+    xs1223.insert(xs1223.end(), xs12.begin(), xs12.end() - 1);
+    xs1223.insert(xs1223.end(), xs23.begin(), xs23.end());
+    // merge small sides together for zs
+    vector<double> zs1223;
+    zs1223.insert(zs1223.end(), zs12.begin(), zs12.end() - 1);
+    zs1223.insert(zs1223.end(), zs23.begin(), zs23.end());
+    // find left and right side xs and zs
+    vector<double> xsLeft;
+    vector<double> xsRight;
+    vector<double> zsLeft;
+    vector<double> zsRight;
+    int middle = std::floor(xs1223.size() / 2);
+    if (xs13[middle] < xs1223[middle])
+    {
+        xsLeft = xs13;
+        xsRight = xs1223;
+        zsLeft = zs13;
+        zsRight = zs1223;
+    }
+    else
+    {
+        xsLeft = xs1223;
+        xsRight = xs13;
+        zsLeft = zs1223;
+        zsRight = zs13;
+    }
+    // for every y from bottom to top
+    for (int y = p1.y; y < p3.y; y++)
+    {
+        // retrieve left, right side for xs
+        int xLeft = xsLeft[y - p1.y];
+        int xRight = xsRight[y - p1.y];
+        // retrieve left, right for zs
+        double zLeft = zsLeft[y - p1.y];
+        double zRight = zsRight[y - p1.y];
+        // interpolate a z depth from left to right
+        vector<double> zSegment = InterpLinear(zLeft, zRight, xRight - xLeft);
+        // draw a line from left to right
+        for (int x = xLeft; x <= xRight; x++)
+        {
+            double z = zSegment[x - xLeft];
+            this->_canvas.SetPixelFromRGBA(x, y, z, color);
         }
     }
 }
@@ -196,28 +358,32 @@ void Rasterizer::_Render()
 
 void Rasterizer::_RenderInstance(const Instance &instance, const Matrix &matrixCamera)
 {
-    Vec3 position = instance.GetTransform().GetTranslation();
-    Matrix matrixFactor = this->_matrixProjection * matrixCamera * instance.GenerateMatrixInstance();
-    for (auto triangle : instance.GetMesh()->GetTriangles())
+    Matrix matrixInstance = instance.GenerateMatrixInstance();
+    vector<shared_ptr<Triangle>> triangles = instance.GetMesh()->GetTriangles();
+    for (auto triangle : triangles)
     {
-        array<shared_ptr<Vec3>, 3> vertices = triangle->GetVertices();
-        // multiply each vertices
-        unique_ptr<Vec> v1Factored = matrixFactor * VecHomogenous((*vertices[0]).x, (*vertices[0]).y, (*vertices[0]).z, 1);
-        unique_ptr<Vec> v2Factored = matrixFactor * VecHomogenous((*vertices[1]).x, (*vertices[1]).y, (*vertices[1]).z, 1);
-        unique_ptr<Vec> v3Factored = matrixFactor * VecHomogenous((*vertices[2]).x, (*vertices[2]).y, (*vertices[2]).z, 1);
-        // cast to vec3
-        Vec3 *v1 = dynamic_cast<Vec3 *>(v1Factored.get());
-        Vec3 *v2 = dynamic_cast<Vec3 *>(v2Factored.get());
-        Vec3 *v3 = dynamic_cast<Vec3 *>(v3Factored.get());
-        if (v1 && v2 && v3)
-        {
-            Vec2 fV1 = Vec2(v1->x, v1->y) * (1 / v1->z);
-            Vec2 fV2 = Vec2(v2->x, v2->y) * (1 / v2->z);
-            Vec2 fV3 = Vec2(v3->x, v3->y) * (1 / v3->z);
-            this->_DrawTriangleWireframe(fV1, fV2, fV3, RGBA(255, 120, 200, 255));
-        }
+        _RenderTriangle(*triangle, matrixCamera, matrixInstance, this->_matrixProjection);
     }
 };
+
+void Rasterizer::_RenderTriangle(const Triangle &triangle, const Matrix &matrixCamera, const Matrix &matrixInstance, const Matrix &matrixProjection)
+{
+    array<shared_ptr<Vec3>, 3> vertices = triangle.GetVertices();
+    Matrix matrixFactor = matrixCamera * matrixInstance;
+    // multiply each vertices
+    unique_ptr<Vec> v1Factored = matrixFactor * VecHomogenous((*vertices[0]).x, (*vertices[0]).y, (*vertices[0]).z, 1);
+    unique_ptr<Vec> v2Factored = matrixFactor * VecHomogenous((*vertices[1]).x, (*vertices[1]).y, (*vertices[1]).z, 1);
+    unique_ptr<Vec> v3Factored = matrixFactor * VecHomogenous((*vertices[2]).x, (*vertices[2]).y, (*vertices[2]).z, 1);
+    // cast to vec3
+    Vec3 *v1 = dynamic_cast<Vec3 *>(v1Factored.get());
+    Vec3 *v2 = dynamic_cast<Vec3 *>(v2Factored.get());
+    Vec3 *v3 = dynamic_cast<Vec3 *>(v3Factored.get());
+    if (v1 && v2 && v3)
+    {
+        this->_DrawTriangleFilled(*v1, *v2, *v3, RGBA(rand() % 256, rand() % 256, rand() % 256, 255), matrixProjection);
+        this->_DrawTriangleWireframe(*v1, *v2, *v3, RGBA(0, 0, 0, 255), matrixProjection);
+    }
+}
 
 Matrix GenerateMatrixProjection(const Canvas &canvas, const Viewport &viewport)
 {

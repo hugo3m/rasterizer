@@ -22,6 +22,7 @@ private:
 
     Matrix _matrixProjection;
 
+    // draw without depth buffer
     void _DrawLine(const Vec2 &from, const Vec2 &to, const RGBA &color);
 
     void _DrawTriangleWireframe(const Vec2 &p1, const Vec2 &p2, const Vec2 &p3, const RGBA &color);
@@ -30,9 +31,19 @@ private:
 
     void _DrawTriangleShaded(Vec2 p1, Vec2 p2, Vec2 p3, const RGBA &color);
 
+    // draw with depth buffer
+    void _DrawLine(Vec3 from, Vec3 to, RGBA color, const Matrix &matrixProjection);
+
+    void _DrawTriangleWireframe(const Vec3 &p1, const Vec3 &p2, const Vec3 &p3, const RGBA &color, const Matrix &matrixProjection);
+
+    void _DrawTriangleFilled(Vec3 p1, Vec3 p2, Vec3 p3, const RGBA &color, const Matrix &matrixProjection);
+
+    // render
     void _Render();
 
     void _RenderInstance(const Instance &instance, const Matrix &matrixCamera);
+
+    void _RenderTriangle(const Triangle &triangle, const Matrix &matrixCamera, const Matrix &matrixInstance, const Matrix &matrixProjection);
 
 public:
     Rasterizer();

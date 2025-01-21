@@ -10,6 +10,7 @@ using namespace std;
 
 int main()
 {
+    srand(time(0));
     printf("Hello World\n");
     return 0;
 }
