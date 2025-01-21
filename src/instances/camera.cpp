@@ -34,3 +34,8 @@ Matrix Camera::GenerateMatrixCamera() const
     Matrix translationMatrix = Matrix({1, 0, 0, translation.x, 0, 1, 0, translation.y, 0, 0, 1, translation.z, 0, 0, 0, 1}, 4, 4);
     return translationMatrix.Inverse();
 }
+
+Transform Camera::GetTransform() const
+{
+    return this->_transform;
+}

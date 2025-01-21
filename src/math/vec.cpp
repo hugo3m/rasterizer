@@ -85,15 +85,6 @@ Vec3 Vec3::operator*(double const &other) const
     return Vec3(this->x * other, this->y * other, this->z * other);
 }
 
-// **** VecHomogenous ****
-
-VecHomogenous::VecHomogenous(double x, double y, double z, double w) : Vec3(x, y, z), w(w) {};
-
-unsigned int VecHomogenous::GetLength() const
-{
-    return Vec3::GetLength() + 1;
-};
-
 Vec3 Vec3::operator/(double const &other) const
 {
     return Vec3(this->x / other, this->y / other, this->z / other);
@@ -113,3 +104,17 @@ double Vec3::Dot(const Vec3 &other) const
 {
     return (this->x * other.x) + (this->y * other.y) + (this->z * other.z);
 }
+
+Vec3 Vec3::CrossProduct(const Vec3 &other) const
+{
+    return Vec3((this->y * other.z) - (this->z * other.y), (this->z * other.x) - (this->x * other.z), (this->x * other.y) - (this->y * other.x));
+}
+
+// **** VecHomogenous ****
+
+VecHomogenous::VecHomogenous(double x, double y, double z, double w) : Vec3(x, y, z), w(w) {};
+
+unsigned int VecHomogenous::GetLength() const
+{
+    return Vec3::GetLength() + 1;
+};

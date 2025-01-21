@@ -47,3 +47,12 @@ TEST(Vec3, Dot)
     EXPECT_EQ(x.Dot(z), 0);
     EXPECT_EQ(y.Dot(z), 0);
 }
+
+TEST(Vec3, CrossProduct)
+{
+    Vec3 x = Vec3(1, 0, 0);
+    Vec3 y = Vec3(0, 1, 0);
+    Vec3 z = Vec3(0, 0, 1);
+    EXPECT_TRUE(x.CrossProduct(y) == z);
+    EXPECT_TRUE(y.CrossProduct(x) == (z * -1));
+}

@@ -27,24 +27,24 @@ Rasterizer::Rasterizer() : _canvas(Canvas(200, 200)), _camera(Camera({1, 1, 1}, 
     shared_ptr<Vec3> v7 = make_shared<Vec3>(-1, -1, -1);
     shared_ptr<Vec3> v8 = make_shared<Vec3>(1, -1, -1);
     // the triangle mesh
-    // back
-    shared_ptr<Triangle> t1 = make_shared<Triangle>(v1, v2, v3);
-    shared_ptr<Triangle> t2 = make_shared<Triangle>(v2, v3, v4);
-    // down
-    shared_ptr<Triangle> t3 = make_shared<Triangle>(v3, v4, v8);
-    shared_ptr<Triangle> t4 = make_shared<Triangle>(v3, v7, v4);
-    // up
-    shared_ptr<Triangle> t5 = make_shared<Triangle>(v1, v2, v5);
-    shared_ptr<Triangle> t6 = make_shared<Triangle>(v5, v6, v2);
-    // left
-    shared_ptr<Triangle> t7 = make_shared<Triangle>(v2, v3, v6);
-    shared_ptr<Triangle> t8 = make_shared<Triangle>(v3, v6, v7);
-    // right
-    shared_ptr<Triangle> t9 = make_shared<Triangle>(v1, v4, v5);
-    shared_ptr<Triangle> t10 = make_shared<Triangle>(v4, v5, v8);
     // front
-    shared_ptr<Triangle> t11 = make_shared<Triangle>(v5, v6, v7);
-    shared_ptr<Triangle> t12 = make_shared<Triangle>(v5, v7, v8);
+    shared_ptr<Triangle> t1 = make_shared<Triangle>(v5, v8, v7);
+    shared_ptr<Triangle> t2 = make_shared<Triangle>(v7, v6, v5);
+    // left
+    shared_ptr<Triangle> t3 = make_shared<Triangle>(v7, v2, v6);
+    shared_ptr<Triangle> t4 = make_shared<Triangle>(v7, v2, v3);
+    // back
+    shared_ptr<Triangle> t5 = make_shared<Triangle>(v1, v2, v4);
+    shared_ptr<Triangle> t6 = make_shared<Triangle>(v2, v3, v4);
+    // right
+    shared_ptr<Triangle> t7 = make_shared<Triangle>(v4, v8, v5);
+    shared_ptr<Triangle> t8 = make_shared<Triangle>(v5, v1, v4);
+    // top
+    shared_ptr<Triangle> t9 = make_shared<Triangle>(v5, v6, v2);
+    shared_ptr<Triangle> t10 = make_shared<Triangle>(v2, v1, v5);
+    // down
+    shared_ptr<Triangle> t11 = make_shared<Triangle>(v4, v3, v7);
+    shared_ptr<Triangle> t12 = make_shared<Triangle>(v7, v8, v4);
     // the cube mesh
     shared_ptr<CubeMesh> c1 = make_shared<CubeMesh>(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12);
     // the cube instance
@@ -378,7 +378,7 @@ void Rasterizer::_RenderTriangle(const Triangle &triangle, const Matrix &matrixC
     Vec3 *v1 = dynamic_cast<Vec3 *>(v1Factored.get());
     Vec3 *v2 = dynamic_cast<Vec3 *>(v2Factored.get());
     Vec3 *v3 = dynamic_cast<Vec3 *>(v3Factored.get());
-    if (v1 && v2 && v3)
+    if (v1 && v2 && v3 && Triangle::IsFacing(*v1, *v2, *v3, this->_camera.GetTransform().GetTranslation()))
     {
         this->_DrawTriangleFilled(*v1, *v2, *v3, RGBA(rand() % 256, rand() % 256, rand() % 256, 255), matrixProjection);
         this->_DrawTriangleWireframe(*v1, *v2, *v3, RGBA(0, 0, 0, 255), matrixProjection);

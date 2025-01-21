@@ -13,5 +13,8 @@ private:
 
 public:
     Triangle(shared_ptr<Vec3> v1, shared_ptr<Vec3> v2, shared_ptr<Vec3> v3);
+
     array<shared_ptr<Vec3>, 3> GetVertices() const;
+
+    static bool IsFacing(const Vec3 &v1, const Vec3 &v2, const Vec3 &v3, const Vec3 &cameraPosition);
 };

@@ -28,4 +28,6 @@ public:
     Viewport GetViewport() const;
 
     Matrix GenerateMatrixCamera() const;
+
+    Transform GetTransform() const;
 };

@@ -55,6 +55,8 @@ public:
 
     double Dot(const Vec3 &other) const;
 
+    Vec3 CrossProduct(const Vec3 &other) const;
+
     virtual unsigned int GetLength() const override;
 
     virtual bool operator==(const Vec3 &other) const;
