@@ -60,6 +60,8 @@ Vec2 Vec2::operator-(const Vec2 &other) const
 
 Vec3::Vec3(double x, double y, double z) : Vec2(x, y), z(z) {};
 
+Vec3::Vec3(const Vec3 &vec3) : Vec2(vec3.x, vec3.y), z(vec3.z) {};
+
 unsigned int Vec3::GetLength() const
 {
     return Vec2::GetLength() + 1;

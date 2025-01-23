@@ -9,6 +9,7 @@
 #include "../math/vec.hpp"
 #include "../math/matrix.hpp"
 #include "../instances/camera.hpp"
+#include "../instances/light.hpp"
 
 using namespace std;
 
@@ -19,6 +20,7 @@ private:
     Camera _camera;
 
     vector<Instance> _instances;
+    vector<shared_ptr<Light>> _lights;
 
     Matrix _matrixProjection;
 
@@ -34,9 +36,9 @@ private:
     // draw with depth buffer
     void _DrawLine(Vec3 from, Vec3 to, RGBA color, const Matrix &matrixProjection);
 
-    void _DrawTriangleWireframe(const Vec3 &p1, const Vec3 &p2, const Vec3 &p3, const RGBA &color, const Matrix &matrixProjection);
+    void _DrawTriangleWireframe(const Triangle &triangle, const RGBA &color, const Matrix &matrixProjection);
 
-    void _DrawTriangleFilled(Vec3 p1, Vec3 p2, Vec3 p3, const RGBA &color, const Matrix &matrixProjection);
+    void _DrawTriangleFilled(const Triangle &triangle, const RGBA &color, const Matrix &matrixProjection);
 
     // render
     void _Render();
@@ -44,6 +46,9 @@ private:
     void _RenderInstance(const Instance &instance, const Matrix &matrixCamera);
 
     void _RenderTriangle(const Triangle &triangle, const Matrix &matrixCamera, const Matrix &matrixInstance, const Matrix &matrixProjection);
+
+    // light
+    double _GetLightingCoeff(const Triangle &triangle) const;
 
 public:
     Rasterizer();

@@ -24,7 +24,7 @@ public:
              shared_ptr<Triangle> t11,
              shared_ptr<Triangle> t12);
 
-    vector<shared_ptr<Triangle>> GetTriangles() const;
+    vector<shared_ptr<Triangle>> GetTriangles() const override;
 
-    vector<shared_ptr<Vec3>> GetUniqueVertices() const;
+    vector<shared_ptr<Vec3>> GetUniqueVertices() const override;
 };

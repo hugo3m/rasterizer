@@ -45,6 +45,8 @@ public:
 
     Vec3(double x, double y, double z);
 
+    Vec3(const Vec3 &vec3);
+
     Vec3 operator+(const Vec3 &other) const;
 
     Vec3 operator/(double const &other) const;

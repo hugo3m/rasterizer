@@ -9,6 +9,10 @@ Plane::Plane(Vec3 normal, double d) : _normal(normal), _d(d)
     this->_d = this->_d / norm;
 };
 
+Plane::Plane(Vec3 normal, Vec3 point) : Plane(normal, normal.Dot(point))
+{
+}
+
 Vec3 Plane::GetNormal() const
 {
     return this->_normal;
@@ -34,16 +38,14 @@ bool Plane::IsIn(const Vec3 &point) const
     return this->SignedDist(point) == 0;
 };
 
-bool Plane::HasIntersection(const Vec3 &from, const Vec3 &to) const
+bool Plane::HasIntersection(const Vec3 &direction) const
 {
-    const Vec3 fromTo = to - from;
-    const double dot = fromTo.Dot(this->_normal);
+    const double dot = direction.Dot(this->_normal);
     return dot != 0;
 };
 
-Vec3 Plane::Intersection(const Vec3 &from, const Vec3 &to) const
+Vec3 Plane::Intersection(const Vec3 &origin, const Vec3 &direction) const
 {
-    const Vec3 fromTo = to - from;
-    const double coefficient = (-this->_d - this->_normal.Dot(from)) / this->_normal.Dot(fromTo);
-    return from + (fromTo * coefficient);
+    const double coefficient = (-this->_d - this->_normal.Dot(origin)) / this->_normal.Dot(direction);
+    return origin + (direction * coefficient);
 }

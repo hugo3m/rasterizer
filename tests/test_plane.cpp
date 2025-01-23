@@ -8,6 +8,14 @@ TEST(PlaneTest, New)
     EXPECT_TRUE(plane1.GetNormal() == plane2.GetNormal());
 }
 
+TEST(PlaneTest, NewFromPoint)
+{
+    Plane plane1 = Plane(Vec3(1, 0, 0), 1);
+    Plane plane2 = Plane(Vec3(1, 0, 0), Vec3(1, 0, 0));
+    EXPECT_TRUE(plane1.GetNormal() == plane2.GetNormal());
+    EXPECT_TRUE(plane1.GetD() == plane2.GetD());
+}
+
 TEST(PlaneTest, IsInFront1)
 {
     Plane plane = Plane(Vec3(1, 0, 0), 0);
@@ -38,10 +46,10 @@ TEST(PlaneTest, SignedDist)
 TEST(PlaneTest, HasIntersection)
 {
     Plane plane = Plane(Vec3(1, 0, 0), 0);
-    EXPECT_FALSE(plane.HasIntersection(Vec3(0, 0, 0), Vec3(0, 1, 0)));
-    EXPECT_TRUE(plane.HasIntersection(Vec3(0, 0, 0), Vec3(1, 0, 0)));
-    EXPECT_TRUE(plane.HasIntersection(Vec3(0, 0, 0), Vec3(-1, 0, 0)));
-    EXPECT_FALSE(plane.HasIntersection(Vec3(1, 0, 0), Vec3(1, 1, 0)));
+    EXPECT_FALSE(plane.HasIntersection(Vec3(0, 1, 0)));
+    EXPECT_TRUE(plane.HasIntersection(Vec3(1, 0, 0)));
+    EXPECT_TRUE(plane.HasIntersection(Vec3(-1, 0, 0)));
+    EXPECT_FALSE(plane.HasIntersection(Vec3(0, 1, 0)));
 }
 
 TEST(PlaneTest, Intersection)
@@ -49,5 +57,5 @@ TEST(PlaneTest, Intersection)
     Plane plane = Plane(Vec3(1, 0, 0), 0);
     EXPECT_TRUE(plane.Intersection(Vec3(0, 0, 0), Vec3(1, 1, 0)) == Vec3(0, 0, 0));
     EXPECT_TRUE(plane.Intersection(Vec3(-1, 0, 0), Vec3(1, 0, 0)) == Vec3(0, 0, 0));
-    EXPECT_TRUE(plane.Intersection(Vec3(-1, 1, 0), Vec3(1, 1, 0)) == Vec3(0, 1, 0));
+    EXPECT_TRUE(plane.Intersection(Vec3(-1, 1, 0), Vec3(1, 0, 0)) == Vec3(0, 1, 0));
 }

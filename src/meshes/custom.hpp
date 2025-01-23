@@ -13,7 +13,7 @@ private:
 public:
     CustomMesh(vector<shared_ptr<Triangle>> triangles);
 
-    vector<shared_ptr<Triangle>> GetTriangles() const;
+    vector<shared_ptr<Triangle>> GetTriangles() const override;
 
-    vector<shared_ptr<Vec3>> GetUniqueVertices() const;
+    vector<shared_ptr<Vec3>> GetUniqueVertices() const override;
 };

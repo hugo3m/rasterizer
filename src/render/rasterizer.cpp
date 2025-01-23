@@ -48,11 +48,14 @@ Rasterizer::Rasterizer() : _canvas(Canvas(200, 200)), _camera(Camera({1, 1, 1}, 
     // the cube mesh
     shared_ptr<CubeMesh> c1 = make_shared<CubeMesh>(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12);
     // the cube instance
-    // this->_instances.push_back(Instance(c1, Transform(Vec3(-1.5, 0, 7), Rotation(0, 0, 0), Vec3(1, 1, 1))));
-    this->_instances.push_back(Instance(c1, Transform(Vec3(0, 0, 5), Rotation(0, 20, 0), Vec3(1, 1, 1))));
 
-    // this->_DrawTriangleFilled(Vec3(-5, -1, 9), Vec3(0, -1, 9), Vec3(0, 1, 9), RGBA(0, 255, 0, 255));
-    // this->_DrawTriangleFilled(Vec3(-5, 0, 10), Vec3(0, 0, 10), Vec3(7, 5, 15), RGBA(255, 0, 0, 255));
+    // this->_instances.push_back(Instance(c1, Transform(Vec3(-1.5, 0, 7), Rotation(0, 0, 0), Vec3(1, 1, 1))));
+    this->_instances.push_back(Instance(c1, Transform(Vec3(0, 0, 3.5), Rotation(0, 20, 0), Vec3(1, 1, 1))));
+
+    // lights
+    this->_lights.push_back(make_shared<LightAmbient>(0.2));
+    this->_lights.push_back(make_shared<LightPoint>(0.8, Vec3(2, 1, 0)));
+    this->_lights.push_back(make_shared<LightDirectional>(0.2, Vec3(1.0, 4.0, 4.0)));
 
     this->_Render();
 }
@@ -133,8 +136,12 @@ void Rasterizer::_DrawTriangleWireframe(const Vec2 &p1, const Vec2 &p2, const Ve
     this->_DrawLine(p3, p1, color);
 }
 
-void Rasterizer::_DrawTriangleWireframe(const Vec3 &p1, const Vec3 &p2, const Vec3 &p3, const RGBA &color, const Matrix &matrixProjection)
+void Rasterizer::_DrawTriangleWireframe(const Triangle &triangle, const RGBA &color, const Matrix &matrixProjection)
 {
+    array<shared_ptr<Vec3>, 3> vertices = triangle.GetVertices();
+    Vec3 p1 = *vertices[0];
+    Vec3 p2 = *vertices[1];
+    Vec3 p3 = *vertices[2];
     this->_DrawLine(p1, p2, color, matrixProjection);
     this->_DrawLine(p2, p3, color, matrixProjection);
     this->_DrawLine(p3, p1, color, matrixProjection);
@@ -191,8 +198,12 @@ void Rasterizer::_DrawTriangleFilled(Vec2 p1, Vec2 p2, Vec2 p3, const RGBA &colo
     }
 }
 
-void Rasterizer::_DrawTriangleFilled(Vec3 v1, Vec3 v2, Vec3 v3, const RGBA &color, const Matrix &matrixProjection)
+void Rasterizer::_DrawTriangleFilled(const Triangle &triangle, const RGBA &color, const Matrix &matrixProjection)
 {
+    array<shared_ptr<Vec3>, 3> vertices = triangle.GetVertices();
+    Vec3 v1 = *vertices[0];
+    Vec3 v2 = *vertices[1];
+    Vec3 v3 = *vertices[2];
     // retrieve projected point
     unique_ptr<Vec> p1Factored = matrixProjection * VecHomogenous(v1.x, v1.y, v1.z, 1);
     unique_ptr<Vec> p2Factored = matrixProjection * VecHomogenous(v2.x, v2.y, v2.z, 1);
@@ -257,6 +268,8 @@ void Rasterizer::_DrawTriangleFilled(Vec3 v1, Vec3 v2, Vec3 v3, const RGBA &colo
         zsLeft = zs1223;
         zsRight = zs13;
     }
+    // get lighting coeff
+    double lightingCoeff = this->_GetLightingCoeff(triangle);
     // for every y from bottom to top
     for (int y = p1.y; y < p3.y; y++)
     {
@@ -272,7 +285,7 @@ void Rasterizer::_DrawTriangleFilled(Vec3 v1, Vec3 v2, Vec3 v3, const RGBA &colo
         for (int x = xLeft; x <= xRight; x++)
         {
             double z = zSegment[x - xLeft];
-            this->_canvas.SetPixelFromRGBA(x, y, z, color);
+            this->_canvas.SetPixelFromRGBA(x, y, z, color * lightingCoeff);
         }
     }
 }
@@ -368,21 +381,25 @@ void Rasterizer::_RenderInstance(const Instance &instance, const Matrix &matrixC
 
 void Rasterizer::_RenderTriangle(const Triangle &triangle, const Matrix &matrixCamera, const Matrix &matrixInstance, const Matrix &matrixProjection)
 {
-    array<shared_ptr<Vec3>, 3> vertices = triangle.GetVertices();
-    Matrix matrixFactor = matrixCamera * matrixInstance;
-    // multiply each vertices
-    unique_ptr<Vec> v1Factored = matrixFactor * VecHomogenous((*vertices[0]).x, (*vertices[0]).y, (*vertices[0]).z, 1);
-    unique_ptr<Vec> v2Factored = matrixFactor * VecHomogenous((*vertices[1]).x, (*vertices[1]).y, (*vertices[1]).z, 1);
-    unique_ptr<Vec> v3Factored = matrixFactor * VecHomogenous((*vertices[2]).x, (*vertices[2]).y, (*vertices[2]).z, 1);
-    // cast to vec3
-    Vec3 *v1 = dynamic_cast<Vec3 *>(v1Factored.get());
-    Vec3 *v2 = dynamic_cast<Vec3 *>(v2Factored.get());
-    Vec3 *v3 = dynamic_cast<Vec3 *>(v3Factored.get());
-    if (v1 && v2 && v3 && Triangle::IsFacing(*v1, *v2, *v3, this->_camera.GetTransform().GetTranslation()))
+    Triangle matrixedTriangle = triangle.Matrixed(matrixCamera, matrixInstance);
+    if (matrixedTriangle.IsFacing(this->_camera.GetTransform().GetTranslation()))
     {
-        this->_DrawTriangleFilled(*v1, *v2, *v3, RGBA(rand() % 256, rand() % 256, rand() % 256, 255), matrixProjection);
-        this->_DrawTriangleWireframe(*v1, *v2, *v3, RGBA(0, 0, 0, 255), matrixProjection);
+        this->_DrawTriangleFilled(matrixedTriangle, RGBA(0, 255, 0, 255), matrixProjection);
+        this->_DrawTriangleWireframe(matrixedTriangle, RGBA(0, 0, 0, 255), matrixProjection);
     }
+}
+
+double Rasterizer::_GetLightingCoeff(const Triangle &triangle) const
+{
+    double coeff = 0;
+    Vec3 position = *triangle.GetVertices()[0];
+    Vec3 normal = triangle.GetNormal();
+    Vec3 direction = position - this->_camera.GetTransform().GetTranslation();
+    for (auto light : this->_lights)
+    {
+        coeff += light->Diffuse(direction, position, normal);
+    }
+    return coeff;
 }
 
 Matrix GenerateMatrixProjection(const Canvas &canvas, const Viewport &viewport)
@@ -495,8 +512,8 @@ vector<shared_ptr<Triangle>> ClipTriangleAgainstPlane(const shared_ptr<Triangle>
             negative1 = v1;
             negative2 = v2;
         }
-        Vec3 positive1 = clipPlane.Intersection(*positive, *negative1);
-        Vec3 positive2 = clipPlane.Intersection(*positive, *negative2);
+        Vec3 positive1 = clipPlane.Intersection(*positive, (*negative1 - *positive));
+        Vec3 positive2 = clipPlane.Intersection(*positive, (*negative2 - *positive));
         res.push_back(make_shared<Triangle>(positive, make_shared<Vec3>(positive1.x, positive1.y, positive1.z), make_shared<Vec3>(positive2.x, positive2.y, positive2.z)));
     }
     // if only one distance negative
@@ -524,8 +541,8 @@ vector<shared_ptr<Triangle>> ClipTriangleAgainstPlane(const shared_ptr<Triangle>
             positive1 = v1;
             positive2 = v2;
         }
-        Vec3 npositive1 = clipPlane.Intersection(*positive1, *negative);
-        Vec3 npositive2 = clipPlane.Intersection(*positive2, *negative);
+        Vec3 npositive1 = clipPlane.Intersection(*positive1, (*negative - *positive1));
+        Vec3 npositive2 = clipPlane.Intersection(*positive2, (*negative - *positive2));
         shared_ptr<Vec3> ptr_npositive1 = make_shared<Vec3>(npositive1.x, npositive1.y, npositive1.z);
         res.push_back(make_shared<Triangle>(positive1, positive2, ptr_npositive1));
         res.push_back(make_shared<Triangle>(ptr_npositive1, positive2, make_shared<Vec3>(npositive2.x, npositive2.y, npositive2.z)));
