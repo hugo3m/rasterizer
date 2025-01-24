@@ -20,6 +20,7 @@ SET(SRC_FILES
     # render
     ${CMAKE_CURRENT_SOURCE_DIR}/render/rgba.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/render/canvas.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/render/material.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/render/rasterizer.cpp
     CACHE STRING "src_files"
 )

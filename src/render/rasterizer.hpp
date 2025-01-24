@@ -38,14 +38,14 @@ private:
 
     void _DrawTriangleWireframe(const Triangle &triangle, const RGBA &color, const Matrix &matrixProjection);
 
-    void _DrawTriangleFilled(const Triangle &triangle, const RGBA &color, const Matrix &matrixProjection);
+    void _DrawTriangleFilled(const Triangle &triangle, const Material &material, const Matrix &matrixProjection);
 
     // render
     void _Render();
 
     void _RenderInstance(const Instance &instance, const Matrix &matrixCamera);
 
-    void _RenderTriangle(const Triangle &triangle, const Matrix &matrixCamera, const Matrix &matrixInstance, const Matrix &matrixProjection);
+    void _RenderTriangle(const Triangle &triangle, const Material &material, const Matrix &matrixCamera, const Matrix &matrixInstance, const Matrix &matrixProjection);
 
     // light
     double _GetLightingCoeff(const Triangle &triangle) const;

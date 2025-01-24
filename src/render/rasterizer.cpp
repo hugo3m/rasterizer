@@ -50,7 +50,7 @@ Rasterizer::Rasterizer() : _canvas(Canvas(200, 200)), _camera(Camera({1, 1, 1}, 
     // the cube instance
 
     // this->_instances.push_back(Instance(c1, Transform(Vec3(-1.5, 0, 7), Rotation(0, 0, 0), Vec3(1, 1, 1))));
-    this->_instances.push_back(Instance(c1, Transform(Vec3(0, 0, 3.5), Rotation(0, 20, 0), Vec3(1, 1, 1))));
+    this->_instances.push_back(Instance(c1, Transform(Vec3(0, 0, 3.5), Rotation(0, 20, 0), Vec3(1, 1, 1)), make_shared<Material>(RGBA(0, 255, 0, 255), 0, 0)));
 
     // lights
     this->_lights.push_back(make_shared<LightAmbient>(0.2));
@@ -198,7 +198,7 @@ void Rasterizer::_DrawTriangleFilled(Vec2 p1, Vec2 p2, Vec2 p3, const RGBA &colo
     }
 }
 
-void Rasterizer::_DrawTriangleFilled(const Triangle &triangle, const RGBA &color, const Matrix &matrixProjection)
+void Rasterizer::_DrawTriangleFilled(const Triangle &triangle, const Material &material, const Matrix &matrixProjection)
 {
     array<shared_ptr<Vec3>, 3> vertices = triangle.GetVertices();
     Vec3 v1 = *vertices[0];
@@ -270,6 +270,7 @@ void Rasterizer::_DrawTriangleFilled(const Triangle &triangle, const RGBA &color
     }
     // get lighting coeff
     double lightingCoeff = this->_GetLightingCoeff(triangle);
+    RGBA color = material.GetColor() * lightingCoeff;
     // for every y from bottom to top
     for (int y = p1.y; y < p3.y; y++)
     {
@@ -285,7 +286,7 @@ void Rasterizer::_DrawTriangleFilled(const Triangle &triangle, const RGBA &color
         for (int x = xLeft; x <= xRight; x++)
         {
             double z = zSegment[x - xLeft];
-            this->_canvas.SetPixelFromRGBA(x, y, z, color * lightingCoeff);
+            this->_canvas.SetPixelFromRGBA(x, y, z, color);
         }
     }
 }
@@ -375,16 +376,16 @@ void Rasterizer::_RenderInstance(const Instance &instance, const Matrix &matrixC
     vector<shared_ptr<Triangle>> triangles = instance.GetMesh()->GetTriangles();
     for (auto triangle : triangles)
     {
-        _RenderTriangle(*triangle, matrixCamera, matrixInstance, this->_matrixProjection);
+        _RenderTriangle(*triangle, *instance.GetMaterial(), matrixCamera, matrixInstance, this->_matrixProjection);
     }
 };
 
-void Rasterizer::_RenderTriangle(const Triangle &triangle, const Matrix &matrixCamera, const Matrix &matrixInstance, const Matrix &matrixProjection)
+void Rasterizer::_RenderTriangle(const Triangle &triangle, const Material &material, const Matrix &matrixCamera, const Matrix &matrixInstance, const Matrix &matrixProjection)
 {
     Triangle matrixedTriangle = triangle.Matrixed(matrixCamera, matrixInstance);
     if (matrixedTriangle.IsFacing(this->_camera.GetTransform().GetTranslation()))
     {
-        this->_DrawTriangleFilled(matrixedTriangle, RGBA(0, 255, 0, 255), matrixProjection);
+        this->_DrawTriangleFilled(matrixedTriangle, material, matrixProjection);
         this->_DrawTriangleWireframe(matrixedTriangle, RGBA(0, 0, 0, 255), matrixProjection);
     }
 }
@@ -397,7 +398,7 @@ double Rasterizer::_GetLightingCoeff(const Triangle &triangle) const
     Vec3 direction = position - this->_camera.GetTransform().GetTranslation();
     for (auto light : this->_lights)
     {
-        coeff += light->Diffuse(direction, position, normal);
+        coeff += light->Diffuse(direction, normal);
     }
     return coeff;
 }
@@ -453,7 +454,7 @@ optional<Instance> ClipInstanceAgainstPlane(const Instance &instance, const Plan
         return {};
     }
     vector<shared_ptr<Triangle>> triangles = ClipTrianglesAgainstPlane(instance.GetMesh()->GetTriangles(), clipPlane);
-    return Instance(make_shared<CustomMesh>(triangles), instance.GetTransform());
+    return Instance(make_shared<CustomMesh>(triangles), instance.GetTransform(), instance.GetMaterial());
 }
 
 vector<shared_ptr<Triangle>> ClipTrianglesAgainstPlane(const vector<shared_ptr<Triangle>> &triangles, const Plane &clipPlane)

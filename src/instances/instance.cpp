@@ -1,6 +1,6 @@
 #include "instance.hpp"
 
-Instance::Instance(shared_ptr<Mesh> mesh, Transform transform) : _mesh(mesh), _transform(transform) {};
+Instance::Instance(shared_ptr<Mesh> mesh, Transform transform, shared_ptr<Material> material) : _mesh(mesh), _transform(transform), _material(material) {};
 
 shared_ptr<Mesh> Instance::GetMesh() const
 {
@@ -10,6 +10,11 @@ shared_ptr<Mesh> Instance::GetMesh() const
 Transform Instance::GetTransform() const
 {
     return this->_transform;
+};
+
+shared_ptr<Material> Instance::GetMaterial() const
+{
+    return this->_material;
 };
 
 Matrix Instance::GenerateMatrixInstance() const
