@@ -269,7 +269,7 @@ void Rasterizer::_DrawTriangleFilled(const Triangle &triangle, const Material &m
         zsRight = zs13;
     }
     // get lighting coeff
-    double lightingCoeff = this->_GetLightingCoeff(triangle);
+    double lightingCoeff = this->_GetLightingCoeff(triangle, material);
     RGBA color = material.GetColor() * lightingCoeff;
     // for every y from bottom to top
     for (int y = p1.y; y < p3.y; y++)
@@ -390,7 +390,7 @@ void Rasterizer::_RenderTriangle(const Triangle &triangle, const Material &mater
     }
 }
 
-double Rasterizer::_GetLightingCoeff(const Triangle &triangle) const
+double Rasterizer::_GetLightingCoeff(const Triangle &triangle, const Material &material) const
 {
     double coeff = 0;
     Vec3 position = *triangle.GetVertices()[0];
@@ -398,7 +398,7 @@ double Rasterizer::_GetLightingCoeff(const Triangle &triangle) const
     Vec3 direction = position - this->_camera.GetTransform().GetTranslation();
     for (auto light : this->_lights)
     {
-        coeff += light->Diffuse(direction, normal);
+        coeff += light->GetLightingCoeff(material, position, this->_camera.GetTransform().GetTranslation(), normal);
     }
     return coeff;
 }

@@ -77,3 +77,5 @@ public:
 
     unsigned int GetLength() const override;
 };
+
+Vec3 Reflection(const Vec3 &direction, const Vec3 &normal);

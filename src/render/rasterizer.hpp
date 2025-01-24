@@ -48,7 +48,7 @@ private:
     void _RenderTriangle(const Triangle &triangle, const Material &material, const Matrix &matrixCamera, const Matrix &matrixInstance, const Matrix &matrixProjection);
 
     // light
-    double _GetLightingCoeff(const Triangle &triangle) const;
+    double _GetLightingCoeff(const Triangle &triangle, const Material &material) const;
 
 public:
     Rasterizer();

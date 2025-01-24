@@ -112,6 +112,11 @@ Vec3 Vec3::CrossProduct(const Vec3 &other) const
     return Vec3((this->y * other.z) - (this->z * other.y), (this->z * other.x) - (this->x * other.z), (this->x * other.y) - (this->y * other.x));
 }
 
+Vec3 Reflection(const Vec3 &direction, const Vec3 &normal)
+{
+    return direction - (normal * 2.0 * normal.Dot(direction));
+}
+
 // **** VecHomogenous ****
 
 VecHomogenous::VecHomogenous(double x, double y, double z, double w) : Vec3(x, y, z), w(w) {};
