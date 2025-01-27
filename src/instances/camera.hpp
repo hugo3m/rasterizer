@@ -30,4 +30,6 @@ public:
     Matrix GenerateMatrixCamera() const;
 
     Transform GetTransform() const;
+
+    void SetTransform(Transform value);
 };

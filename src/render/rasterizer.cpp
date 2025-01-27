@@ -10,7 +10,7 @@
 
 using namespace std;
 
-Rasterizer::Rasterizer() : _canvas(Canvas(200, 200)), _camera(Camera({1, 1, 1}, Transform(Vec3(0, 0, 0), Rotation(0, 0, 0), Vec3(0, 0, 0)))), _matrixProjection(GenerateMatrixProjection(_canvas, _camera.GetViewport()))
+Rasterizer::Rasterizer() : _canvas(Canvas(200, 200)), _camera(Camera({1, 1, 1}, Transform(Vec3(0, -1, 0), Rotation(0, 0, 0), Vec3(0, 0, 0)))), _matrixProjection(GenerateMatrixProjection(_canvas, _camera.GetViewport()))
 {
     // // this->_DrawTriangleFilled(Vec2(-70, -70), Vec2(70, -25), Vec2(80, 80), RGBA(255, 0, 0, 255));
     // // this->_DrawTriangleShaded(Vec2(-70, -70), Vec2(70, -25), Vec2(80, 80), RGBA(255, 0, 0, 255));
@@ -50,14 +50,14 @@ Rasterizer::Rasterizer() : _canvas(Canvas(200, 200)), _camera(Camera({1, 1, 1}, 
     // the cube instance
 
     // this->_instances.push_back(Instance(c1, Transform(Vec3(-1.5, 0, 7), Rotation(0, 0, 0), Vec3(1, 1, 1))));
-    this->_instances.push_back(Instance(c1, Transform(Vec3(0, 0, 3.5), Rotation(0, 20, 0), Vec3(1, 1, 1)), make_shared<Material>(RGBA(0, 255, 0, 255), 0, 0)));
+    this->_instances.push_back(Instance(c1, Transform(Vec3(0, 0, 3.5), Rotation(0, 0, 0), Vec3(1, 1, 1)), make_shared<Material>(RGBA(0, 255, 0, 255), 0, 0)));
 
     // lights
     this->_lights.push_back(make_shared<LightAmbient>(0.2));
     this->_lights.push_back(make_shared<LightPoint>(0.8, Vec3(2, 1, 0)));
     this->_lights.push_back(make_shared<LightDirectional>(0.2, Vec3(1.0, 4.0, 4.0)));
 
-    this->_Render();
+    this->Render();
 }
 
 vector<int> Rasterizer::Draw() const
@@ -360,8 +360,10 @@ void Rasterizer::_DrawTriangleShaded(Vec2 p1, Vec2 p2, Vec2 p3, const RGBA &colo
     }
 }
 
-void Rasterizer::_Render()
+void Rasterizer::Render()
 {
+    Vec3 cameraTranslation = this->_camera.GetTransform().GetTranslation();
+    printf("cameraTranslation x=%f y=%f z=%f \n", cameraTranslation.x, cameraTranslation.y, cameraTranslation.z);
     Matrix matrixCamera = this->_camera.GenerateMatrixCamera();
     vector<Instance> clippedInstances = ClipInstancesAgainstPlanes(this->_instances, this->_camera.GetClippingPlanes());
     for (const Instance &instance : clippedInstances)
@@ -401,6 +403,18 @@ double Rasterizer::_GetLightingCoeff(const Triangle &triangle, const Material &m
         coeff += light->GetLightingCoeff(material, position, this->_camera.GetTransform().GetTranslation(), normal);
     }
     return coeff;
+}
+
+void Rasterizer::Input(bool forward, bool backward, bool left, bool right, bool up, bool down, double deltaTime)
+{
+    double x = (right ? 1 : 0) + (left ? -1 : 0);
+    double y = (up ? 1 : 0) + (down ? -1 : 0);
+    double z = (forward ? 1 : 0) + (backward ? -1 : 0);
+    Vec3 translation = Vec3(x, y, z).Normalize();
+    printf("translation x=%f y=%f z=%f \n", translation.x, translation.y, translation.z);
+    Transform cameraTransform = this->_camera.GetTransform();
+    cameraTransform.SetTranslation(cameraTransform.GetTranslation() + translation);
+    this->_camera.SetTransform(cameraTransform);
 }
 
 Matrix GenerateMatrixProjection(const Canvas &canvas, const Viewport &viewport)

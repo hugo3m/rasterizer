@@ -99,7 +99,8 @@ double Vec3::Norm() const
 
 Vec3 Vec3::Normalize() const
 {
-    return (*this) / this->Norm();
+    double norm = this->Norm();
+    return norm > 0 ? (*this) / this->Norm() : (*this);
 }
 
 double Vec3::Dot(const Vec3 &other) const

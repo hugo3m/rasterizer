@@ -38,7 +38,7 @@ public:
 
     double Diffuse(const Vec3 &direction, const Vec3 &normal) const override;
 
-    double Specular(const Material &material, const Vec3 &cameraToPoint, const Vec3 &lightToPoint, const Vec3 &normal) const;
+    double Specular(const Material &material, const Vec3 &direction, const Vec3 &target, const Vec3 &normal) const;
 
     double GetLightingCoeff(const Material &material, const Vec3 &point, const Vec3 &cameraPosition, const Vec3 &normal) const override;
 };
@@ -53,7 +53,7 @@ public:
 
     double Diffuse(const Vec3 &direction, const Vec3 &normal) const override;
 
-    double Specular(const Material &material, const Vec3 &cameraToPoint, const Vec3 &normal) const;
+    double Specular(const Material &material, const Vec3 &direction, const Vec3 &target, const Vec3 &normal) const;
 
     double GetLightingCoeff(const Material &material, const Vec3 &point, const Vec3 &cameraPosition, const Vec3 &normal) const override;
 };

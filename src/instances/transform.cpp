@@ -13,3 +13,7 @@ Vec3 Transform::GetScale() const
 {
     return this->_scale;
 };
+void Transform::SetTranslation(Vec3 value)
+{
+    this->_translation = value;
+};

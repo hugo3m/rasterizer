@@ -1,28 +1,29 @@
 "use client";
 
-import { useEffect, useRef } from 'react';
+import Engine, {InputInfo} from "../utils/engine";
+import { useEffect, useRef, useState } from 'react';
+
+import { Nullable } from '@/utils/type';
 
 export default function Test() {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  useEffect(() => {
+  const [inputInfo, setInputInfo] = useState<Nullable<InputInfo>>(null);
 
-      const run = async () => {
-        if (!canvasRef.current) return;
-        const ctx = canvasRef.current.getContext("2d");
-        if (!ctx) return ;
-        const CPP = await (await import('../lib/cpp.js')).default();
-        const rasterizer = new CPP.Rasterizer();
-        const draw = rasterizer.Draw();
-        const array: number[] = [];
-        for (let i = 0; i < draw.size(); i++){
-          array.push(draw.get(i) as number);
-        }
-        ctx.putImageData(new ImageData(new Uint8ClampedArray(array), 200,  200), 0, 0);
-        rasterizer.delete();
-      };
-      run();
+  useEffect(() => {
+    const run = async () => {
+      if (!canvasRef.current) return;
+      const ctx = canvasRef.current.getContext("2d");
+      if (!ctx) return ;
+      const CPP = await (await import('../lib/cpp.js')).default();
+      const rasterizer = new CPP.Rasterizer();
+      Engine.create(rasterizer, canvasRef.current, 200, 200, () => {}, setInputInfo);
+    };
+    run();
+    return () => {
+        Engine.destroy();
+    }
   }, []);
 
   return (

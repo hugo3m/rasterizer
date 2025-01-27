@@ -18,4 +18,6 @@ public:
     Vec3 GetTranslation() const;
     Rotation GetRotation() const;
     Vec3 GetScale() const;
+
+    void SetTranslation(Vec3 value);
 };

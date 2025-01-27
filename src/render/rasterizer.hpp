@@ -41,8 +41,6 @@ private:
     void _DrawTriangleFilled(const Triangle &triangle, const Material &material, const Matrix &matrixProjection);
 
     // render
-    void _Render();
-
     void _RenderInstance(const Instance &instance, const Matrix &matrixCamera);
 
     void _RenderTriangle(const Triangle &triangle, const Material &material, const Matrix &matrixCamera, const Matrix &matrixInstance, const Matrix &matrixProjection);
@@ -54,6 +52,10 @@ public:
     Rasterizer();
 
     vector<int> Draw() const;
+
+    void Input(bool forward, bool backward, bool left, bool right, bool up, bool down, double deltaTime);
+
+    void Render();
 };
 
 Matrix GenerateMatrixProjection(const Canvas &canvas, const Viewport &viewport);

@@ -39,3 +39,8 @@ Transform Camera::GetTransform() const
 {
     return this->_transform;
 }
+
+void Camera::SetTransform(Transform value)
+{
+    this->_transform = value;
+}

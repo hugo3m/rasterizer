@@ -19,6 +19,8 @@ EMSCRIPTEN_BINDINGS(module)
 {
     emscripten::class_<Rasterizer>("Rasterizer")
         .constructor<>()
+        .function("Input", &Rasterizer::Input)
+        .function("Render", &Rasterizer::Render)
         .function("Draw", &Rasterizer::Draw);
     // register bindings for std::vector<int>, std::map<int, std::string>, and
     // std::optional<std::string>.
