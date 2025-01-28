@@ -15,6 +15,9 @@ private:
 
 public:
     Transform(Vec3 translation, Rotation rotation, Vec3 scale);
+
+    Transform();
+
     Vec3 GetTranslation() const;
     Rotation GetRotation() const;
     Vec3 GetScale() const;

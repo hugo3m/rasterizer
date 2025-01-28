@@ -26,4 +26,8 @@ public:
     Triangle Matrixed(const Matrix &matrixCamera, const Matrix &matrixInstance) const;
 
     Vec3 GetNormal() const;
+
+    Triangle operator*(Matrix const &matrix) const;
+
+    bool operator==(const Triangle &other) const;
 };

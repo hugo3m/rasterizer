@@ -1,4 +1,7 @@
 #include "canvas.hpp"
+#include <algorithm>
+
+using namespace std;
 
 Canvas::Canvas(int height, int width) : _height(height), _width(width)
 {
@@ -52,6 +55,10 @@ void Canvas::SetPixel(int x, int y, int r, int g, int b, int a)
 
 void Canvas::SetPixelFromRGBA(int x, int y, double depth, RGBA rgba)
 {
+    if (x <= -this->GetWidthMax() || x >= this->GetWidthMax() || y <= -this->GetWidthMax() || y >= this->GetHeightMax())
+    {
+        return;
+    }
     if (depth > this->_GetDepthValue(x, y))
     {
         this->_SetDepthValue(x, y, depth);

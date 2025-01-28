@@ -118,6 +118,11 @@ Vec3 Reflection(const Vec3 &direction, const Vec3 &normal)
     return direction - (normal * 2.0 * normal.Dot(direction));
 }
 
+Vec3 Vec3::ToVec3() const
+{
+    return Vec3(this->x, this->y, this->z);
+}
+
 // **** VecHomogenous ****
 
 VecHomogenous::VecHomogenous(double x, double y, double z, double w) : Vec3(x, y, z), w(w) {};
@@ -126,3 +131,12 @@ unsigned int VecHomogenous::GetLength() const
 {
     return Vec3::GetLength() + 1;
 };
+
+Vec3 VecHomogenous::ToVec3() const
+{
+    if (this->w != 0)
+    {
+        return Vec3(this->x / this->w, this->y / this->w, this->z / this->w);
+    }
+    return Vec3(this->x, this->y, this->z);
+}

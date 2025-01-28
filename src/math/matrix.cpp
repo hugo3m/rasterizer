@@ -98,6 +98,10 @@ Matrix Matrix::operator*(const Matrix &other) const
 
 unique_ptr<Vec> Matrix::ToVec() const
 {
+    if (this->GetColumnLength() != 1)
+    {
+        throw invalid_argument("impossible to convert to vec");
+    }
     if (this->GetRowLength() == 2)
     {
         return make_unique<Vec2>(this->Get(0, 0), this->Get(1, 0));
@@ -149,7 +153,7 @@ double Matrix::Determinant() const
     double determinant = 0;
     for (unsigned int i = 0; i < size; i++)
     {
-        int sign = pow(-1, i);
+        int sign = (i % 2 == 0) ? 1 : -1;
         double cofactor = sign * this->Get(0, i);
         Matrix minor = this->Minor(0, i);
         determinant += cofactor * minor.Determinant();
@@ -185,7 +189,7 @@ Matrix Matrix::Cofactor() const
     {
         for (unsigned int itColumn = 0; itColumn < this->GetColumnLength(); itColumn++)
         {
-            int sign = pow(-1, (itRow * this->GetRowLength()) + itColumn);
+            int sign = ((itRow + itColumn) % 2 == 0) ? 1 : -1;
             Matrix minor = this->Minor(itRow, itColumn);
             double determinant = minor.Determinant();
             data.push_back(sign * determinant);
@@ -236,4 +240,17 @@ Matrix Matrix::Inverse() const
     }
     Matrix adjoint = this->Adjoint();
     return adjoint * (1 / determinant);
+}
+
+void Matrix::Print() const
+{
+    for (unsigned int itRow = 0; itRow < this->GetRowLength(); itRow++)
+    {
+        printf("[");
+        for (unsigned int itColumn = 0; itColumn < this->GetColumnLength(); itColumn++)
+        {
+            printf("%f,", this->Get(itRow, itColumn));
+        }
+        printf("] \n");
+    }
 }

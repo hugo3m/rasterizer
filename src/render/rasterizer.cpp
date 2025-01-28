@@ -6,11 +6,12 @@
 #include "../math/triangle.hpp"
 #include "../math/plane.hpp"
 #include "../meshes/cube.hpp"
+#include "../meshes/triangle.hpp"
 #include "../meshes/custom.hpp"
 
 using namespace std;
 
-Rasterizer::Rasterizer() : _canvas(Canvas(200, 200)), _camera(Camera({1, 1, 1}, Transform(Vec3(0, -1, 0), Rotation(0, 0, 0), Vec3(0, 0, 0)))), _matrixProjection(GenerateMatrixProjection(_canvas, _camera.GetViewport()))
+Rasterizer::Rasterizer() : _canvas(Canvas(200, 200)), _camera(Camera({1, 1, 1}, Transform(Vec3(0, 0, 0), Rotation(0, 0, 0), Vec3(0, 0, 0)))), _matrixProjection(GenerateMatrixProjection(_canvas, _camera.GetViewport()))
 {
     // // this->_DrawTriangleFilled(Vec2(-70, -70), Vec2(70, -25), Vec2(80, 80), RGBA(255, 0, 0, 255));
     // // this->_DrawTriangleShaded(Vec2(-70, -70), Vec2(70, -25), Vec2(80, 80), RGBA(255, 0, 0, 255));
@@ -47,10 +48,18 @@ Rasterizer::Rasterizer() : _canvas(Canvas(200, 200)), _camera(Camera({1, 1, 1}, 
     shared_ptr<Triangle> t12 = make_shared<Triangle>(v7, v8, v4);
     // the cube mesh
     shared_ptr<CubeMesh> c1 = make_shared<CubeMesh>(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12);
+
+    // shared_ptr<Vec3> vv1 = make_shared<Vec3>(0, 0, 0);
+    // shared_ptr<Vec3> vv2 = make_shared<Vec3>(1, 0, 0);
+    // shared_ptr<Vec3> vv3 = make_shared<Vec3>(1, 1, 0);
+
+    // shared_ptr<Triangle> tt1 = make_shared<Triangle>(vv1, vv2, vv3);
+
+    // shared_ptr<TriangleMesh> tm1 = make_shared<TriangleMesh>(tt1);
     // the cube instance
 
     // this->_instances.push_back(Instance(c1, Transform(Vec3(-1.5, 0, 7), Rotation(0, 0, 0), Vec3(1, 1, 1))));
-    this->_instances.push_back(Instance(c1, Transform(Vec3(0, 0, 3.5), Rotation(0, 0, 0), Vec3(1, 1, 1)), make_shared<Material>(RGBA(0, 255, 0, 255), 0, 0)));
+    this->_instances.push_back(Instance(c1, Transform(Vec3(3, 0, 5), Rotation(0, 0, 0), Vec3(1, 1, 1)), make_shared<Material>(RGBA(0, 255, 0, 255), 0, 0)));
 
     // lights
     this->_lights.push_back(make_shared<LightAmbient>(0.2));
@@ -201,21 +210,20 @@ void Rasterizer::_DrawTriangleFilled(Vec2 p1, Vec2 p2, Vec2 p3, const RGBA &colo
 void Rasterizer::_DrawTriangleFilled(const Triangle &triangle, const Material &material, const Matrix &matrixProjection)
 {
     array<shared_ptr<Vec3>, 3> vertices = triangle.GetVertices();
+    printf("Triangle before multiplication(%f, %f, %f) v1(%f, %f, %f) v2(%f, %f, %f) \n", vertices[0]->x, vertices[0]->y, vertices[0]->z, vertices[1]->x, vertices[1]->y, vertices[1]->z, vertices[2]->x, vertices[2]->y, vertices[2]->z);
     Vec3 v1 = *vertices[0];
     Vec3 v2 = *vertices[1];
     Vec3 v3 = *vertices[2];
     // retrieve projected point
-    unique_ptr<Vec> p1Factored = matrixProjection * VecHomogenous(v1.x, v1.y, v1.z, 1);
-    unique_ptr<Vec> p2Factored = matrixProjection * VecHomogenous(v2.x, v2.y, v2.z, 1);
-    unique_ptr<Vec> p3Factored = matrixProjection * VecHomogenous(v3.x, v3.y, v3.z, 1);
-    // cast to vec3
-    Vec3 *p1Vec3 = dynamic_cast<Vec3 *>(p1Factored.get());
-    Vec3 *p2Vec3 = dynamic_cast<Vec3 *>(p2Factored.get());
-    Vec3 *p3Vec3 = dynamic_cast<Vec3 *>(p3Factored.get());
+    Triangle projectedTriangle = triangle * matrixProjection;
+    array<shared_ptr<Vec3>, 3> projectedVertices = projectedTriangle.GetVertices();
+    vertices = projectedTriangle.GetVertices();
+    printf("Triangle before multiplication(%f, %f, %f) v1(%f, %f, %f) v2(%f, %f, %f) \n", vertices[0]->x, vertices[0]->y, vertices[0]->z, vertices[1]->x, vertices[1]->y, vertices[1]->z, vertices[2]->x, vertices[2]->y, vertices[2]->z);
     // apply to vec2
-    Vec2 p1 = Vec2(p1Vec3->x, p1Vec3->y) * (1 / p1Vec3->z);
-    Vec2 p2 = Vec2(p2Vec3->x, p2Vec3->y) * (1 / p2Vec3->z);
-    Vec2 p3 = Vec2(p3Vec3->x, p3Vec3->y) * (1 / p3Vec3->z);
+    Vec2 p1 = Vec2(projectedVertices[0]->x, projectedVertices[0]->y) * (1 / projectedVertices[0]->z);
+    Vec2 p2 = Vec2(projectedVertices[1]->x, projectedVertices[1]->y) * (1 / projectedVertices[1]->z);
+    Vec2 p3 = Vec2(projectedVertices[2]->x, projectedVertices[2]->y) * (1 / projectedVertices[2]->z);
+    printf("Triangle to Vec2(%f, %f) v1(%f, %f) v2(%f, %f) \n", p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
     // put smallest y in p1 and biggest in p3
     if (p2.y < p1.y)
     {
@@ -270,7 +278,7 @@ void Rasterizer::_DrawTriangleFilled(const Triangle &triangle, const Material &m
     }
     // get lighting coeff
     double lightingCoeff = this->_GetLightingCoeff(triangle, material);
-    RGBA color = material.GetColor() * lightingCoeff;
+    RGBA color = material.GetColor();
     // for every y from bottom to top
     for (int y = p1.y; y < p3.y; y++)
     {
@@ -362,34 +370,47 @@ void Rasterizer::_DrawTriangleShaded(Vec2 p1, Vec2 p2, Vec2 p3, const RGBA &colo
 
 void Rasterizer::Render()
 {
-    Vec3 cameraTranslation = this->_camera.GetTransform().GetTranslation();
-    printf("cameraTranslation x=%f y=%f z=%f \n", cameraTranslation.x, cameraTranslation.y, cameraTranslation.z);
     Matrix matrixCamera = this->_camera.GenerateMatrixCamera();
-    vector<Instance> clippedInstances = ClipInstancesAgainstPlanes(this->_instances, this->_camera.GetClippingPlanes());
+    vector<Instance> scenedInstances;
+    for (auto instance : this->_instances)
+    {
+        scenedInstances.push_back(Instance(make_shared<CustomMesh>(instance.GetSceneTriangles(matrixCamera)), Transform(), instance.GetMaterial()));
+    }
+    vector<Instance> clippedInstances = ClipInstancesAgainstPlanes(scenedInstances, this->_camera.GetClippingPlanes());
     for (const Instance &instance : clippedInstances)
     {
-        this->_RenderInstance(instance, matrixCamera);
+        this->_RenderInstance(instance);
     }
 };
 
-void Rasterizer::_RenderInstance(const Instance &instance, const Matrix &matrixCamera)
+void Rasterizer::_RenderInstance(const Instance &instance)
 {
-    Matrix matrixInstance = instance.GenerateMatrixInstance();
-    vector<shared_ptr<Triangle>> triangles = instance.GetMesh()->GetTriangles();
-    for (auto triangle : triangles)
+    this->_matrixProjection.Print();
+    for (auto triangle : instance.GetRawTriangles())
     {
-        _RenderTriangle(*triangle, *instance.GetMaterial(), matrixCamera, matrixInstance, this->_matrixProjection);
+        _RenderTriangle(*triangle, *instance.GetMaterial(), this->_matrixProjection);
     }
 };
 
-void Rasterizer::_RenderTriangle(const Triangle &triangle, const Material &material, const Matrix &matrixCamera, const Matrix &matrixInstance, const Matrix &matrixProjection)
+void Rasterizer::_RenderTriangle(const Triangle &triangle, const Material &material, const Matrix &matrixProjection)
 {
-    Triangle matrixedTriangle = triangle.Matrixed(matrixCamera, matrixInstance);
-    if (matrixedTriangle.IsFacing(this->_camera.GetTransform().GetTranslation()))
+    if (triangle.IsFacing(this->_camera.GetTransform().GetTranslation()))
     {
-        this->_DrawTriangleFilled(matrixedTriangle, material, matrixProjection);
-        this->_DrawTriangleWireframe(matrixedTriangle, RGBA(0, 0, 0, 255), matrixProjection);
+        array<shared_ptr<Vec3>, 3> vertices = triangle.GetVertices();
+        this->_DrawTriangleWireframe(triangle, RGBA(0, 0, 0, 255), matrixProjection);
+        this->_DrawTriangleFilled(triangle, material, matrixProjection);
     }
+
+    // array<shared_ptr<Vec3>, 3> vertices = triangle.GetVertices();
+    // // retrieve projected point
+    // Triangle projectedTriangle = triangle * matrixProjection;
+    // array<shared_ptr<Vec3>, 3> projectedVertices = projectedTriangle.GetVertices();
+    // // apply to vec2
+    // Vec2 p1 = Vec2(projectedVertices[0]->x, projectedVertices[0]->y) * (1 / projectedVertices[0]->z);
+    // Vec2 p2 = Vec2(projectedVertices[1]->x, projectedVertices[1]->y) * (1 / projectedVertices[1]->z);
+    // Vec2 p3 = Vec2(projectedVertices[2]->x, projectedVertices[2]->y) * (1 / projectedVertices[2]->z);
+
+    // this->_DrawTriangleFilled(p1, p2, p3, RGBA(rand() % 256, rand() % 256, rand() % 256, 255));
 }
 
 double Rasterizer::_GetLightingCoeff(const Triangle &triangle, const Material &material) const
@@ -411,26 +432,25 @@ void Rasterizer::Input(bool forward, bool backward, bool left, bool right, bool 
     double y = (up ? 1 : 0) + (down ? -1 : 0);
     double z = (forward ? 1 : 0) + (backward ? -1 : 0);
     Vec3 translation = Vec3(x, y, z).Normalize();
-    printf("translation x=%f y=%f z=%f \n", translation.x, translation.y, translation.z);
     Transform cameraTransform = this->_camera.GetTransform();
-    cameraTransform.SetTranslation(cameraTransform.GetTranslation() + translation);
+    cameraTransform.SetTranslation(cameraTransform.GetTranslation() + (translation * deltaTime * 3.0));
     this->_camera.SetTransform(cameraTransform);
 }
 
 Matrix GenerateMatrixProjection(const Canvas &canvas, const Viewport &viewport)
 {
-    double widthRatio = (viewport.depth * canvas.GetWidthMax() * 2) / viewport.width;
-    double heightRatio = (viewport.depth * canvas.GetHeightMax() * 2) / viewport.height;
+    double widthRatio = (viewport.depth * (canvas.GetWidthMax() - 1)) / viewport.width;
+    double heightRatio = (viewport.depth * (canvas.GetHeightMax() - 1)) / viewport.height;
     return Matrix({widthRatio, 0, 0, 0, 0, heightRatio, 0, 0, 0, 0, 1, 0}, 3, 4);
 }
 
 vector<Instance> ClipInstancesAgainstPlanes(const vector<Instance> &instances, const array<Plane, 5> &clipPlanes)
 {
     vector<Instance> res;
-    for (const auto instance : instances)
+    for (const Instance instance : instances)
     {
         optional<Instance> clippedInstance = ClipInstanceAgainstPlanes(instance, clipPlanes);
-        if (clippedInstance)
+        if (clippedInstance.has_value())
         {
             res.push_back(clippedInstance.value());
         }
@@ -438,19 +458,18 @@ vector<Instance> ClipInstancesAgainstPlanes(const vector<Instance> &instances, c
     return res;
 };
 
-optional<Instance> ClipInstanceAgainstPlanes(const Instance &instance, const array<Plane, 5> &clipPlanes)
+optional<Instance> ClipInstanceAgainstPlanes(Instance instance, const array<Plane, 5> &clipPlanes)
 {
-    Instance res = instance;
-    for (const auto clipPlane : clipPlanes)
+    for (const auto &clipPlane : clipPlanes)
     {
-        optional<Instance> optInstance = ClipInstanceAgainstPlane(res, clipPlane);
-        if (!optInstance)
+        optional<Instance> optInstance = ClipInstanceAgainstPlane(instance, clipPlane);
+        if (!optInstance.has_value())
         {
             return {};
         }
-        res = optInstance.value();
+        instance = optInstance.value();
     }
-    return res;
+    return instance;
 }
 
 optional<Instance> ClipInstanceAgainstPlane(const Instance &instance, const Plane &clipPlane)
@@ -458,7 +477,7 @@ optional<Instance> ClipInstanceAgainstPlane(const Instance &instance, const Plan
     Sphere boundingSphere = instance.GetBoundingSphere();
     double radius = boundingSphere.GetRadius();
     Vec3 center = boundingSphere.GetCenter();
-    double signedDistance = clipPlane.SignedDist(boundingSphere.GetCenter());
+    double signedDistance = clipPlane.SignedDist(center);
     if (signedDistance > radius)
     {
         return instance;
@@ -467,27 +486,24 @@ optional<Instance> ClipInstanceAgainstPlane(const Instance &instance, const Plan
     {
         return {};
     }
-    vector<shared_ptr<Triangle>> triangles = ClipTrianglesAgainstPlane(instance.GetMesh()->GetTriangles(), clipPlane);
+    vector<Triangle> triangles = ClipTrianglesAgainstPlane(instance.GetRawTriangles(), clipPlane);
     return Instance(make_shared<CustomMesh>(triangles), instance.GetTransform(), instance.GetMaterial());
 }
 
-vector<shared_ptr<Triangle>> ClipTrianglesAgainstPlane(const vector<shared_ptr<Triangle>> &triangles, const Plane &clipPlane)
+vector<Triangle> ClipTrianglesAgainstPlane(const vector<shared_ptr<Triangle>> &triangles, const Plane &clipPlane)
 {
-    vector<shared_ptr<Triangle>> res;
-    for (const auto triangle : triangles)
+    vector<Triangle> res;
+    for (const auto &triangle : triangles)
     {
-        vector<shared_ptr<Triangle>> clippedTriangles = ClipTriangleAgainstPlane(triangle, clipPlane);
-        for (const auto clippedTriangle : clippedTriangles)
-        {
-            res.push_back(clippedTriangle);
-        }
+        vector<Triangle> clippedTriangles = ClipTriangleAgainstPlane(triangle, clipPlane);
+        res.insert(res.end(), clippedTriangles.begin(), clippedTriangles.end());
     }
     return res;
 };
 
-vector<shared_ptr<Triangle>> ClipTriangleAgainstPlane(const shared_ptr<Triangle> &triangle, const Plane &clipPlane)
+vector<Triangle> ClipTriangleAgainstPlane(const shared_ptr<Triangle> &triangle, const Plane &clipPlane)
 {
-    vector<shared_ptr<Triangle>> res;
+    vector<Triangle> res;
 
     array<shared_ptr<Vec3>, 3> vertices = triangle->GetVertices();
     shared_ptr<Vec3> v1 = vertices[0];
@@ -500,67 +516,59 @@ vector<shared_ptr<Triangle>> ClipTriangleAgainstPlane(const shared_ptr<Triangle>
     if (d1 >= 0 && d2 >= 0 && d3 >= 0)
     {
         // just current triangle
-        res.push_back(triangle);
+        res.push_back(*triangle);
+        return res;
     }
-    // if only one distance positive
-    if ((d1 >= 0 && d2 < 0 && d3 < 0) || (d2 >= 0 && d1 < 0 && d3 < 0) || (d3 >= 0 && d1 < 0 && d2 < 0))
+    // if all distance negative
+    if (d1 < 0 && d2 < 0 && d3 < 0)
     {
-        // find out which one
-        shared_ptr<Vec3> positive;
-        shared_ptr<Vec3> negative1;
-        shared_ptr<Vec3> negative2;
-        if (d1 >= 0)
-        {
-            positive = v1;
-            negative1 = v2;
-            negative2 = v3;
-        }
-        if (d2 >= 0)
-        {
-            positive = v2;
-            negative1 = v1;
-            negative2 = v3;
-        }
-        if (d3 >= 0)
-        {
-            positive = v3;
-            negative1 = v1;
-            negative2 = v2;
-        }
-        Vec3 positive1 = clipPlane.Intersection(*positive, (*negative1 - *positive));
-        Vec3 positive2 = clipPlane.Intersection(*positive, (*negative2 - *positive));
-        res.push_back(make_shared<Triangle>(positive, make_shared<Vec3>(positive1.x, positive1.y, positive1.z), make_shared<Vec3>(positive2.x, positive2.y, positive2.z)));
+        return res;
     }
-    // if only one distance negative
-    if ((d1 >= 0 && d2 >= 0 && d3 < 0) || (d1 >= 0 && d3 >= 0 && d2 < 0) || (d2 >= 0 && d3 >= 0 && d1 < 0))
+    // Some vertices inside, some outside
+    vector<shared_ptr<Vec3>> insideVertices;
+    vector<shared_ptr<Vec3>> outsideVertices;
+
+    if (d1 >= 0)
+        insideVertices.push_back(v1);
+    else
+        outsideVertices.push_back(v1);
+
+    if (d2 >= 0)
+        insideVertices.push_back(v2);
+    else
+        outsideVertices.push_back(v2);
+
+    if (d3 >= 0)
+        insideVertices.push_back(v3);
+    else
+        outsideVertices.push_back(v3);
+
+    // Handle cases where one vertex is inside and two are outside
+    if (insideVertices.size() == 1)
     {
-        // find out which one
-        shared_ptr<Vec3> negative;
-        shared_ptr<Vec3> positive1;
-        shared_ptr<Vec3> positive2;
-        if (d1 < 0)
-        {
-            negative = v1;
-            positive1 = v2;
-            positive2 = v3;
-        }
-        if (d2 < 0)
-        {
-            negative = v2;
-            positive1 = v1;
-            positive2 = v3;
-        }
-        if (d3 < 0)
-        {
-            negative = v3;
-            positive1 = v1;
-            positive2 = v2;
-        }
-        Vec3 npositive1 = clipPlane.Intersection(*positive1, (*negative - *positive1));
-        Vec3 npositive2 = clipPlane.Intersection(*positive2, (*negative - *positive2));
-        shared_ptr<Vec3> ptr_npositive1 = make_shared<Vec3>(npositive1.x, npositive1.y, npositive1.z);
-        res.push_back(make_shared<Triangle>(positive1, positive2, ptr_npositive1));
-        res.push_back(make_shared<Triangle>(ptr_npositive1, positive2, make_shared<Vec3>(npositive2.x, npositive2.y, npositive2.z)));
+        shared_ptr<Vec3> inside = insideVertices[0];
+        shared_ptr<Vec3> outside1 = outsideVertices[0];
+        shared_ptr<Vec3> outside2 = outsideVertices[1];
+
+        Vec3 intersection1 = clipPlane.Intersection(*inside, *outside1 - *inside);
+        Vec3 intersection2 = clipPlane.Intersection(*inside, *outside2 - *inside);
+
+        res.push_back(Triangle(inside, make_shared<Vec3>(intersection1), make_shared<Vec3>(intersection2)));
     }
+
+    // Handle cases where two vertices are inside and one is outside
+    else if (insideVertices.size() == 2)
+    {
+        shared_ptr<Vec3> inside1 = insideVertices[0];
+        shared_ptr<Vec3> inside2 = insideVertices[1];
+        shared_ptr<Vec3> outside = outsideVertices[0];
+
+        Vec3 intersection1 = clipPlane.Intersection(*inside1, *outside - *inside1);
+        Vec3 intersection2 = clipPlane.Intersection(*inside2, *outside - *inside2);
+
+        res.push_back(Triangle(inside1, inside2, make_shared<Vec3>(intersection1)));
+        res.push_back(Triangle(inside2, make_shared<Vec3>(intersection1), make_shared<Vec3>(intersection2)));
+    }
+
     return res;
 }

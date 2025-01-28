@@ -67,4 +67,6 @@ public:
     unique_ptr<Vec> operator*(const Vec3 &vec) const;
 
     unique_ptr<Vec> operator*(const VecHomogenous &vec) const;
+
+    void Print() const;
 };

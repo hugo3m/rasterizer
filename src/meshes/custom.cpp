@@ -2,6 +2,14 @@
 
 CustomMesh::CustomMesh(vector<shared_ptr<Triangle>> triangles) : _triangles(triangles) {};
 
+CustomMesh::CustomMesh(vector<Triangle> triangles)
+{
+    for (Triangle triangle : triangles)
+    {
+        this->_triangles.push_back(make_shared<Triangle>(triangle));
+    }
+}
+
 vector<shared_ptr<Triangle>> CustomMesh::GetTriangles() const
 {
 

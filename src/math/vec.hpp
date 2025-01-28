@@ -66,6 +66,8 @@ public:
     virtual Vec3 operator-(const Vec3 &other) const;
 
     Vec3 operator*(double const &other) const;
+
+    virtual Vec3 ToVec3() const;
 };
 
 class VecHomogenous : public Vec3
@@ -76,6 +78,8 @@ public:
     VecHomogenous(double x, double y, double z, double w);
 
     unsigned int GetLength() const override;
+
+    Vec3 ToVec3() const override;
 };
 
 Vec3 Reflection(const Vec3 &direction, const Vec3 &normal);

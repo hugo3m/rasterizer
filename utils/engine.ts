@@ -74,7 +74,6 @@ class Engine {
         this.setFps(1 / this.deltaTime);
         this.setInputInfo(this.inputInfo);
         const startTime: number = Date.now();
-        console.log(this.inputInfo);
         this.rasterizer.Input(this.inputInfo.forward,
             this.inputInfo.backward,
             this.inputInfo.left,
@@ -93,7 +92,7 @@ class Engine {
         const minTimeMs = (1 / this.refreshRate) * 1000;
         const timeToWait = minTimeMs > elapsedTimeMs ? minTimeMs - elapsedTimeMs : 0;
         this.deltaTime = (elapsedTimeMs + timeToWait) / 1000;
-        setTimeout(this.update.bind(this), timeToWait);
+        // setTimeout(this.update.bind(this), timeToWait);
     };
 
     private mapEventToBoolean(event: Event): boolean {

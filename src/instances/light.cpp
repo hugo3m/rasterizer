@@ -1,4 +1,5 @@
 #include "light.hpp"
+#include <math.h>
 
 // **** Light ****
 Light::Light(double intensity) : _intensity(intensity) {};

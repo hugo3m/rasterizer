@@ -144,6 +144,12 @@ TEST(Matrix, Determinant44)
     EXPECT_EQ(matrix.Determinant(), 3766);
 }
 
+TEST(Matrix, Determinant442)
+{
+    Matrix matrix = Matrix({1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}, 4, 4);
+    EXPECT_EQ(matrix.Determinant(), 1);
+}
+
 TEST(Matrix, Comatrice)
 {
     Matrix matrix = Matrix({1, 2, 3, 0, 1, 2, -1, -4, -1}, 3, 3);
@@ -158,6 +164,29 @@ TEST(Matrix, Comatrice)
     EXPECT_EQ(cofactor[2][0], expect[2][0]);
     EXPECT_EQ(cofactor[2][1], expect[2][1]);
     EXPECT_EQ(cofactor[2][2], expect[2][2]);
+}
+
+TEST(Matrix, Comatrice2)
+{
+    Matrix matrix = Matrix({1, 0, 2, 0, 0, 3, 0, 4, 5, 0, 6, 0, 0, 7, 0, 8}, 4, 4);
+    Matrix cofactor = matrix.Cofactor();
+    Matrix expect = Matrix({-24, 0, 20, 0, 0, -32, 0, 28, 8, 0, -4, 0, 0, 16, 0, -12}, 4, 4);
+    EXPECT_EQ(cofactor[0][0], expect[0][0]);
+    EXPECT_EQ(cofactor[0][1], expect[0][1]);
+    EXPECT_EQ(cofactor[0][2], expect[0][2]);
+    EXPECT_EQ(cofactor[0][3], expect[0][3]);
+    EXPECT_EQ(cofactor[1][0], expect[1][0]);
+    EXPECT_EQ(cofactor[1][1], expect[1][1]);
+    EXPECT_EQ(cofactor[1][2], expect[1][2]);
+    EXPECT_EQ(cofactor[1][3], expect[1][3]);
+    EXPECT_EQ(cofactor[2][0], expect[2][0]);
+    EXPECT_EQ(cofactor[2][1], expect[2][1]);
+    EXPECT_EQ(cofactor[2][2], expect[2][2]);
+    EXPECT_EQ(cofactor[2][3], expect[2][3]);
+    EXPECT_EQ(cofactor[3][0], expect[3][0]);
+    EXPECT_EQ(cofactor[3][1], expect[3][1]);
+    EXPECT_EQ(cofactor[3][2], expect[3][2]);
+    EXPECT_EQ(cofactor[3][3], expect[3][3]);
 }
 
 TEST(Matrix, Transpose)
@@ -212,6 +241,28 @@ TEST(Matrix, Adjoint)
     EXPECT_EQ(adjoint[2][2], -3);
 }
 
+TEST(Matrix, Adjoint2)
+{
+    Matrix matrix = Matrix({1, 2, 3, 4, 5, -5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16}, 4, 4);
+    Matrix adjoint = matrix.Adjoint();
+    EXPECT_EQ(adjoint[0][0], 44);
+    EXPECT_EQ(adjoint[0][1], 0);
+    EXPECT_EQ(adjoint[0][2], -132);
+    EXPECT_EQ(adjoint[0][3], 88);
+    EXPECT_EQ(adjoint[1][0], 0);
+    EXPECT_EQ(adjoint[1][1], 0);
+    EXPECT_EQ(adjoint[1][2], 0);
+    EXPECT_EQ(adjoint[1][3], 0);
+    EXPECT_EQ(adjoint[2][0], -132);
+    EXPECT_EQ(adjoint[2][1], 0);
+    EXPECT_EQ(adjoint[2][2], 396);
+    EXPECT_EQ(adjoint[2][3], -264);
+    EXPECT_EQ(adjoint[3][0], 88);
+    EXPECT_EQ(adjoint[3][1], 0);
+    EXPECT_EQ(adjoint[3][2], -264);
+    EXPECT_EQ(adjoint[3][3], 176);
+}
+
 TEST(Matrix, Inverse)
 {
     Matrix matrix = Matrix({1, 0, 0, 0, 1, 0, 0, 0, 1}, 3, 3);
@@ -225,4 +276,26 @@ TEST(Matrix, Inverse)
     EXPECT_EQ(inverse[2][0], 0);
     EXPECT_EQ(inverse[2][1], 0);
     EXPECT_EQ(inverse[2][2], 1);
+}
+
+TEST(Matrix, Inverse2)
+{
+    Matrix matrix = Matrix({1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}, 4, 4);
+    Matrix inverse = matrix.Inverse();
+    EXPECT_EQ(inverse[0][0], 1);
+    EXPECT_EQ(inverse[0][1], 0);
+    EXPECT_EQ(inverse[0][2], 0);
+    EXPECT_EQ(inverse[0][3], 0);
+    EXPECT_EQ(inverse[1][0], 0);
+    EXPECT_EQ(inverse[1][1], 1);
+    EXPECT_EQ(inverse[1][2], 0);
+    EXPECT_EQ(inverse[1][3], 0);
+    EXPECT_EQ(inverse[2][0], 0);
+    EXPECT_EQ(inverse[2][1], 0);
+    EXPECT_EQ(inverse[2][2], 1);
+    EXPECT_EQ(inverse[2][3], 0);
+    EXPECT_EQ(inverse[3][0], 0);
+    EXPECT_EQ(inverse[3][1], 0);
+    EXPECT_EQ(inverse[3][2], 0);
+    EXPECT_EQ(inverse[3][3], 1);
 }

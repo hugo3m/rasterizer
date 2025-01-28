@@ -35,3 +35,24 @@ Sphere Instance::GetBoundingSphere() const
     double maxScale = max(scale.x, max(scale.y, scale.z));
     return Sphere(meshBoundingSphere.GetCenter() + translate, maxScale * meshBoundingSphere.GetRadius());
 }
+
+vector<shared_ptr<Triangle>> Instance::GetSceneTriangles(const Matrix &matrixCamera) const
+{
+    vector<shared_ptr<Triangle>> res;
+    Matrix matrixFactor = this->GenerateMatrixInstance() * matrixCamera;
+    vector<shared_ptr<Triangle>> triangles = this->GetMesh()->GetTriangles();
+    for (auto triangle : triangles)
+    {
+        array<shared_ptr<Vec3>, 3> vertices = triangle->GetVertices();
+        // printf("Triangle before multiplication(%f, %f, %f) v1(%f, %f, %f) v2(%f, %f, %f) \n", vertices[0]->x, vertices[0]->y, vertices[0]->z, vertices[1]->x, vertices[1]->y, vertices[1]->z, vertices[2]->x, vertices[2]->y, vertices[2]->z);
+        Triangle matrixTriangle = (*triangle) * matrixFactor;
+        vertices = matrixTriangle.GetVertices();
+        res.push_back(make_shared<Triangle>(vertices[0], vertices[1], vertices[2]));
+    }
+    return res;
+}
+
+vector<shared_ptr<Triangle>> Instance::GetRawTriangles() const
+{
+    return this->_mesh->GetTriangles();
+};

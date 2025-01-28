@@ -29,5 +29,9 @@ public:
 
     Matrix GenerateMatrixInstance() const;
 
+    vector<shared_ptr<Triangle>> GetSceneTriangles(const Matrix &matrixCamera) const;
+
+    vector<shared_ptr<Triangle>> GetRawTriangles() const;
+
     Sphere GetBoundingSphere() const;
 };

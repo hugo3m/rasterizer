@@ -41,9 +41,9 @@ private:
     void _DrawTriangleFilled(const Triangle &triangle, const Material &material, const Matrix &matrixProjection);
 
     // render
-    void _RenderInstance(const Instance &instance, const Matrix &matrixCamera);
+    void _RenderInstance(const Instance &instance);
 
-    void _RenderTriangle(const Triangle &triangle, const Material &material, const Matrix &matrixCamera, const Matrix &matrixInstance, const Matrix &matrixProjection);
+    void _RenderTriangle(const Triangle &triangle, const Material &material, const Matrix &matrixProjection);
 
     // light
     double _GetLightingCoeff(const Triangle &triangle, const Material &material) const;
@@ -62,10 +62,10 @@ Matrix GenerateMatrixProjection(const Canvas &canvas, const Viewport &viewport);
 
 vector<Instance> ClipInstancesAgainstPlanes(const vector<Instance> &instances, const array<Plane, 5> &clipPlanes);
 
-optional<Instance> ClipInstanceAgainstPlanes(const Instance &instance, const array<Plane, 5> &clipPlanes);
+optional<Instance> ClipInstanceAgainstPlanes(Instance instance, const array<Plane, 5> &clipPlanes);
 
 optional<Instance> ClipInstanceAgainstPlane(const Instance &instance, const Plane &clipPlane);
 
-vector<shared_ptr<Triangle>> ClipTrianglesAgainstPlane(const vector<shared_ptr<Triangle>> &triangles, const Plane &clipPlane);
+vector<Triangle> ClipTrianglesAgainstPlane(const vector<shared_ptr<Triangle>> &triangles, const Plane &clipPlane);
 
-vector<shared_ptr<Triangle>> ClipTriangleAgainstPlane(const shared_ptr<Triangle> &triangle, const Plane &clipPlane);
+vector<Triangle> ClipTriangleAgainstPlane(const shared_ptr<Triangle> &triangle, const Plane &clipPlane);
