@@ -59,7 +59,7 @@ Rasterizer::Rasterizer() : _canvas(Canvas(200, 200)), _camera(Camera({1, 1, 1}, 
     // the cube instance
 
     // this->_instances.push_back(Instance(c1, Transform(Vec3(-1.5, 0, 7), Rotation(0, 0, 0), Vec3(1, 1, 1))));
-    this->_instances.push_back(Instance(c1, Transform(Vec3(3, 0, 5), Rotation(0, 0, 0), Vec3(1, 1, 1)), make_shared<Material>(RGBA(0, 255, 0, 255), 0, 0)));
+    this->_instances.push_back(Instance(c1, Transform(Vec3(0, 0, 5), Rotation(0, 0, 0), Vec3(1, 1, 1)), make_shared<Material>(RGBA(0, 255, 0, 255), 0, 0)));
 
     // lights
     this->_lights.push_back(make_shared<LightAmbient>(0.2));
@@ -370,6 +370,7 @@ void Rasterizer::_DrawTriangleShaded(Vec2 p1, Vec2 p2, Vec2 p3, const RGBA &colo
 
 void Rasterizer::Render()
 {
+    this->_canvas.Reset();
     Matrix matrixCamera = this->_camera.GenerateMatrixCamera();
     vector<Instance> scenedInstances;
     for (auto instance : this->_instances)

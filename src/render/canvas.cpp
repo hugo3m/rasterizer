@@ -5,7 +5,7 @@ using namespace std;
 
 Canvas::Canvas(int height, int width) : _height(height), _width(width)
 {
-    for (int i = 0; i < height * width; i++)
+    for (int i = 0; i < this->_height * this->_width; i++)
     {
         this->_pixels.push_back(RGBA(255, 255, 255, 255));
         this->_depthBuffer.push_back(0);
@@ -79,4 +79,16 @@ double Canvas::_GetDepthValue(int x, int y) const
 void Canvas::_SetDepthValue(int x, int y, double depth)
 {
     this->_depthBuffer[this->_GetPixelFlatIndex(x, y)] = depth;
+}
+
+void Canvas::Reset()
+{
+    for (int x = -this->GetWidthMax(); x < this->GetWidthMax(); x++)
+    {
+        for (int y = -this->GetHeightMax(); y < this->GetHeightMax() - 1; y++)
+        {
+            this->_pixels[this->_GetPixelFlatIndex(x, y)].Set(RGBA(255, 255, 255, 255));
+            this->_depthBuffer[this->_GetPixelFlatIndex(x, y)] = 0;
+        }
+    }
 }

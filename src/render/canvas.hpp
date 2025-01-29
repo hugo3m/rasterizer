@@ -24,6 +24,8 @@ public:
 
     vector<int> Render() const;
 
+    void Reset();
+
     int GetWidthMax() const;
 
     int GetHeightMax() const;
