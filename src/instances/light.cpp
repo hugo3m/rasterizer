@@ -9,7 +9,7 @@ double Light::GetIntensity() const
     return this->_intensity;
 }
 
-double _GetSpecularCoeff(const Material &material, const Vec3 &direction, const Vec3 &target, const Vec3 &normal)
+double _GetSpecularCoeff(const Material &material, const Vec3 &lightDirection, const Vec3 &targetDirection, const Vec3 &normal)
 {
     double specular = material.GetSpecular();
     if (specular <= 0)
@@ -18,9 +18,9 @@ double _GetSpecularCoeff(const Material &material, const Vec3 &direction, const 
     }
     // direction from light to point
     // direction from camera to point
-    Vec3 reflected = Reflection(direction, normal);
+    Vec3 reflected = Reflection(lightDirection, normal);
     // let reflected = reflection(&direction, &info.normal);
-    double coeff = reflected.Dot(target) / (reflected.Norm() * target.Norm());
+    double coeff = reflected.Dot(targetDirection) / (reflected.Norm() * targetDirection.Norm());
     return powf(coeff, specular);
 }
 
@@ -45,7 +45,7 @@ LightPoint::LightPoint(double intensity, Vec3 position) : Light(intensity), _pos
 
 double LightPoint::Diffuse(const Vec3 &direction, const Vec3 &normal) const
 {
-    double coeff = direction.Dot(normal) / (normal.Norm() * direction.Norm());
+    double coeff = (direction * -1).Dot(normal) / (normal.Norm() * direction.Norm());
     return this->_intensity * coeff;
 };
 
@@ -54,12 +54,12 @@ double LightPoint::Specular(const Material &material, const Vec3 &direction, con
     return this->_intensity * _GetSpecularCoeff(material, direction, target, normal);
 };
 
-double LightPoint::GetLightingCoeff(const Material &material, const Vec3 &point, const Vec3 &cameraPosition, const Vec3 &normal) const
+double LightPoint::GetLightingCoeff(const Material &material, const Vec3 &position, const Vec3 &cameraPosition, const Vec3 &normal) const
 {
     double coeff = 0;
-    Vec3 lightToPoint = point - this->_position;
-    coeff += this->Diffuse(lightToPoint, normal);
-    coeff += this->Specular(material, lightToPoint, cameraPosition - point, normal);
+    Vec3 lightToPosition = position - this->_position;
+    coeff += this->Diffuse(lightToPosition, normal);
+    // coeff += this->Specular(material, lightToPosition, cameraPosition - position, normal);
     return coeff;
 };
 
@@ -69,19 +69,19 @@ LightDirectional::LightDirectional(double intensity, Vec3 direction) : Light(int
 
 double LightDirectional::Diffuse(const Vec3 &direction, const Vec3 &normal) const
 {
-    double coeff = this->_direction.Dot(normal) / (normal.Norm() * this->_direction.Norm());
+    double coeff = (this->_direction * -1).Dot(normal) / (normal.Norm() * this->_direction.Norm());
     return this->_intensity * coeff;
 };
 
-double LightDirectional::Specular(const Material &material, const Vec3 &direction, const Vec3 &target, const Vec3 &normal) const
+double LightDirectional::Specular(const Material &material, const Vec3 &targetDirection, const Vec3 &normal) const
 {
-    return this->_intensity * _GetSpecularCoeff(material, this->_direction, target, normal);
+    return this->_intensity * _GetSpecularCoeff(material, this->_direction, targetDirection, normal);
 };
 
-double LightDirectional::GetLightingCoeff(const Material &material, const Vec3 &point, const Vec3 &cameraPosition, const Vec3 &normal) const
+double LightDirectional::GetLightingCoeff(const Material &material, const Vec3 &position, const Vec3 &cameraPosition, const Vec3 &normal) const
 {
     double coeff = 0;
     coeff += this->Diffuse(this->_direction, normal);
-    coeff += this->Specular(material, this->_direction, cameraPosition - point, normal);
+    // coeff += this->Specular(material, cameraPosition - position, normal);
     return coeff;
 };

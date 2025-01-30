@@ -30,4 +30,6 @@ public:
     Triangle operator*(Matrix const &matrix) const;
 
     bool operator==(const Triangle &other) const;
+
+    void Print() const;
 };

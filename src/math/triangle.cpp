@@ -24,7 +24,7 @@ Vec3 Triangle::GetNormal() const
 
 bool Triangle::IsFacing(const Vec3 &origin) const
 {
-    Vec3 direction = *this->_vertices[0] - origin;
+    Vec3 direction = origin - *this->_vertices[0];
     return this->GetNormal().Dot(direction) > 0;
 }
 
@@ -120,4 +120,9 @@ bool Triangle::operator==(const Triangle &other) const
         }
     }
     return true;
+}
+
+void Triangle::Print() const
+{
+    printf("[(%f, %f, %f), (%f, %f, %f), (%f, %f, %f)] \n", this->_vertices[0]->x, this->_vertices[0]->y, this->_vertices[0]->z, this->_vertices[1]->x, this->_vertices[1]->y, this->_vertices[1]->z, this->_vertices[2]->x, this->_vertices[2]->y, this->_vertices[2]->z);
 }

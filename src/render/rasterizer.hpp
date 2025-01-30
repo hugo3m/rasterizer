@@ -40,13 +40,15 @@ private:
 
     void _DrawTriangleFilled(const Triangle &triangle, const Material &material, const Matrix &matrixProjection);
 
+    void _DrawTriangleShaded(const Triangle &triangle, const Material &material, const Matrix &matrixProjection);
+
     // render
     void _RenderInstance(const Instance &instance);
 
     void _RenderTriangle(const Triangle &triangle, const Material &material, const Matrix &matrixProjection);
 
     // light
-    double _GetLightingCoeff(const Triangle &triangle, const Material &material) const;
+    double _GetLightingCoeff(const Vec3 &position, const Vec3 &normal, const Material &material) const;
 
 public:
     Rasterizer();

@@ -56,3 +56,11 @@ TEST(Vec3, CrossProduct)
     EXPECT_TRUE(x.CrossProduct(y) == z);
     EXPECT_TRUE(y.CrossProduct(x) == (z * -1));
 }
+
+TEST(Vec3, Reflection)
+{
+    Vec3 norm = Vec3(0, -1, 0);
+    Vec3 direction = Vec3(1, 1, 0);
+    Vec3 reflected = Reflection(direction, norm);
+    EXPECT_TRUE(reflected == Vec3(1, -1, 0));
+}
