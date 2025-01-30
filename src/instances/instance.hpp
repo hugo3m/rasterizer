@@ -1,6 +1,8 @@
 #pragma once
 
 #include <memory>
+#include <functional>
+
 #include "../meshes/mesh.hpp"
 #include "../math/vec.hpp"
 #include "../math/matrix.hpp"
@@ -18,6 +20,8 @@ private:
 
     shared_ptr<Material> _material;
 
+    vector<function<void(Instance &, const double deltaTime)>> _updateBehaviors;
+
 public:
     Instance(shared_ptr<Mesh> mesh, Transform transform, shared_ptr<Material> material);
 
@@ -34,4 +38,10 @@ public:
     vector<shared_ptr<Triangle>> GetRawTriangles() const;
 
     Sphere GetBoundingSphere() const;
+
+    void AddUpdateBehavior(function<void(Instance &, const double deltaTime)> updateBehavior);
+
+    void Update(const double deltaTime);
+
+    void SetTransform(Transform value);
 };

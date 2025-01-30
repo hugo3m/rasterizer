@@ -13,10 +13,6 @@ using namespace std;
 
 Rasterizer::Rasterizer() : _canvas(Canvas(200, 200)), _camera(Camera({1, 1, 1}, Transform(Vec3(0, 0, 0), Rotation(0, 0, 0), Vec3(0, 0, 0)))), _matrixProjection(GenerateMatrixProjection(_canvas, _camera.GetViewport()))
 {
-    // // this->_DrawTriangleFilled(Vec2(-70, -70), Vec2(70, -25), Vec2(80, 80), RGBA(255, 0, 0, 255));
-    // // this->_DrawTriangleShaded(Vec2(-70, -70), Vec2(70, -25), Vec2(80, 80), RGBA(255, 0, 0, 255));
-    // // this->_DrawTriangleWireframe(Vec2(-70, -70), Vec2(70, -25), Vec2(80, 80), RGBA(255, 0, 0, 255));
-
     // The four "front" vertices
     shared_ptr<Vec3> v0 = make_shared<Vec3>(1, 1, 1);
     shared_ptr<Vec3> v1 = make_shared<Vec3>(-1, 1, 1);
@@ -49,14 +45,26 @@ Rasterizer::Rasterizer() : _canvas(Canvas(200, 200)), _camera(Camera({1, 1, 1}, 
     // the cube mesh
     shared_ptr<CubeMesh> c1 = make_shared<CubeMesh>(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11);
     // the cube instance
-    this->_instances.push_back(Instance(c1, Transform(Vec3(0, 0, 5), Rotation(0, 0, 0), Vec3(1, 1, 1)), make_shared<Material>(RGBA(0, 255, 0, 255), 500, 0)));
+    Instance i1 = Instance(c1, Transform(Vec3(0, 0, 5), Rotation(0, 0, 0), Vec3(1, 1, 1)), make_shared<Material>(RGBA(0, 255, 0, 255), 500, 0));
+    Instance i2 = Instance(c1, Transform(Vec3(0, -2.5, 5), Rotation(0, 0, 0), Vec3(1, 0.1, 1)), make_shared<Material>(RGBA(151, 99, 71, 255), 0, 0));
+
+    i1.AddUpdateBehavior([](Instance &instance, const double deltaTime)
+                         {
+        Transform transform = instance.GetTransform();
+        Rotation rotation = transform.GetRotation();
+        Rotation nextRotation = Rotation(rotation.yaw, rotation.pitch + (deltaTime * 0.5), rotation.roll);
+        transform.SetRotation(nextRotation);
+        instance.SetTransform(transform); });
+
+    this->_instances.push_back(i1);
+    this->_instances.push_back(i2);
 
     // lights
-    this->_lights.push_back(make_shared<LightAmbient>(0.5));
-    this->_lights.push_back(make_shared<LightPoint>(0.8, Vec3(2, 0, 4)));
-    this->_lights.push_back(make_shared<LightDirectional>(2, Vec3(0, -1, 0)));
+    this->_lights.push_back(make_shared<LightAmbient>(0.3));
+    this->_lights.push_back(make_shared<LightPoint>(0.5, Vec3(2, 0, -2)));
+    this->_lights.push_back(make_shared<LightDirectional>(0.2, Vec3(0, -1, 0)));
 
-    this->Render();
+    // this->Render();
 }
 
 vector<int> Rasterizer::Draw() const
@@ -87,7 +95,6 @@ void Rasterizer::_DrawLine(Vec3 from, Vec3 to, RGBA color, const Matrix &matrixP
     Vec2 toVec2 = Vec2(toProjected->x, toProjected->y) * (1 / toProjected->z);
     // interpolate zs for every sides
     vector<double> zFromTo;
-    // InterpLinear(1 / v1.z, 1 / v2.z, xs12.size());
     // if line horizontal-ish
     if (abs(toVec2.x - fromVec2.x) > abs(toVec2.y - fromVec2.y))
     {
@@ -355,7 +362,7 @@ void Rasterizer::_DrawTriangleShaded(Vec2 p1, Vec2 p2, Vec2 p3, const RGBA &colo
     }
 }
 
-void Rasterizer::_DrawTriangleShaded(const Triangle &triangle, const Material &material, const Matrix &matrixProjection)
+void Rasterizer::_DrawTriangleShadedGoureau(const Triangle &triangle, const Material &material, const Matrix &matrixProjection)
 {
     array<shared_ptr<Vec3>, 3> vertices = triangle.GetVertices();
     Vec3 v1 = *vertices[0];
@@ -397,7 +404,7 @@ void Rasterizer::_DrawTriangleShaded(const Triangle &triangle, const Material &m
     vector<double> zs12 = InterpLinear(1 / v1.z, 1 / v2.z, xs12.size());
     vector<double> zs13 = InterpLinear(1 / v1.z, 1 / v3.z, xs13.size());
     vector<double> zs23 = InterpLinear(1 / v2.z, 1 / v3.z, xs23.size());
-    // interpolate intensity for every height
+    // interpolate intensity for every sides
     vector<double> is12 = InterpLinear(i1, i2, xs12.size());
     vector<double> is13 = InterpLinear(i1, i3, xs13.size());
     vector<double> is23 = InterpLinear(i2, i3, xs23.size());
@@ -465,9 +472,104 @@ void Rasterizer::_DrawTriangleShaded(const Triangle &triangle, const Material &m
     }
 }
 
-void Rasterizer::Render()
+void Rasterizer::_DrawTriangleShadedPong(const Triangle &triangle, const Material &material, const Matrix &matrixProjection)
+{
+    array<shared_ptr<Vec3>, 3> vertices = triangle.GetVertices();
+    Vec3 v1 = *vertices[0];
+    Vec3 v2 = *vertices[1];
+    Vec3 v3 = *vertices[2];
+    // retrieve projected point
+    Triangle projectedTriangle = triangle * matrixProjection;
+    array<shared_ptr<Vec3>, 3> projectedVertices = projectedTriangle.GetVertices();
+    vertices = projectedTriangle.GetVertices();
+    // apply to vec2
+    Vec2 p1 = Vec2(projectedVertices[0]->x, projectedVertices[0]->y) * (1 / projectedVertices[0]->z);
+    Vec2 p2 = Vec2(projectedVertices[1]->x, projectedVertices[1]->y) * (1 / projectedVertices[1]->z);
+    Vec2 p3 = Vec2(projectedVertices[2]->x, projectedVertices[2]->y) * (1 / projectedVertices[2]->z);
+    // put smallest y in p1 and biggest in p3
+    if (p2.y < p1.y)
+    {
+        std::swap(p1, p2);
+        std::swap(v1, v2);
+    }
+    if (p3.y < p1.y)
+    {
+        std::swap(p1, p3);
+        std::swap(v1, v3);
+    }
+    if (p3.y < p2.y)
+    {
+        std::swap(p2, p3);
+        std::swap(v2, v3);
+    }
+    // interpolate xs for every sides
+    vector<double> xs12 = InterpLinear(p1.x, p2.x, p2.y - p1.y);
+    vector<double> xs13 = InterpLinear(p1.x, p3.x, p3.y - p1.y);
+    vector<double> xs23 = InterpLinear(p2.x, p3.x, p3.y - p2.y);
+    // interpolate zs for every sides
+    vector<double> zs12 = InterpLinear(1 / v1.z, 1 / v2.z, xs12.size());
+    vector<double> zs13 = InterpLinear(1 / v1.z, 1 / v3.z, xs13.size());
+    vector<double> zs23 = InterpLinear(1 / v2.z, 1 / v3.z, xs23.size());
+    // merge small sides together for xs
+    vector<double> xs1223;
+    xs1223.insert(xs1223.end(), xs12.begin(), xs12.end() - 1);
+    xs1223.insert(xs1223.end(), xs23.begin(), xs23.end());
+    // merge small sides together for zs
+    vector<double> zs1223;
+    zs1223.insert(zs1223.end(), zs12.begin(), zs12.end() - 1);
+    zs1223.insert(zs1223.end(), zs23.begin(), zs23.end());
+    // find left and right side xs and zs
+    vector<double> xsLeft;
+    vector<double> xsRight;
+    vector<double> zsLeft;
+    vector<double> zsRight;
+    int middle = std::floor(xs1223.size() / 2);
+    if (xs13[middle] < xs1223[middle])
+    {
+        xsLeft = xs13;
+        xsRight = xs1223;
+        zsLeft = zs13;
+        zsRight = zs1223;
+    }
+    else
+    {
+        xsLeft = xs1223;
+        xsRight = xs13;
+        zsLeft = zs1223;
+        zsRight = zs13;
+    }
+    Matrix matrixProjectionInverse = matrixProjection.Inverse();
+    // for every y from bottom to top
+    for (int y = p1.y; y < p3.y; y++)
+    {
+        // retrieve left, right side for xs
+        int xLeft = xsLeft[y - p1.y];
+        int xRight = xsRight[y - p1.y];
+        // retrieve left, right for zs
+        double zLeft = zsLeft[y - p1.y];
+        double zRight = zsRight[y - p1.y];
+        // interpolate a z depth from left to right
+        vector<double> zSegment = InterpLinear(zLeft, zRight, xRight - xLeft);
+        // draw a line from left to right
+        for (int x = xLeft; x <= xRight; x++)
+        {
+            double z = zSegment[x - xLeft];
+            unique_ptr<Vec> recoverPointHomogenous = matrixProjectionInverse * VecHomogenous(x, y, 1 / z, 1);
+            Vec3 *recoverPoint = dynamic_cast<Vec3 *>(recoverPointHomogenous.get());
+            double coeff = this->_GetLightingCoeff(*recoverPoint, triangle.GetNormal(), material);
+            RGBA color = material.GetColor() * coeff;
+            this->_canvas.SetPixelFromRGBA(x, y, z, color);
+        }
+    }
+}
+
+void Rasterizer::Render(const double deltaTime)
 {
     this->_canvas.Reset();
+    for (Instance &instance : this->_instances)
+    {
+        instance.Update(deltaTime);
+    }
     Matrix matrixCamera = this->_camera.GenerateMatrixCamera();
     vector<Instance> scenedInstances;
     for (auto instance : this->_instances)
@@ -495,7 +597,7 @@ void Rasterizer::_RenderTriangle(const Triangle &triangle, const Material &mater
     {
         array<shared_ptr<Vec3>, 3> vertices = triangle.GetVertices();
         // this->_DrawTriangleWireframe(triangle, RGBA(0, 0, 0, 255), matrixProjection);
-        this->_DrawTriangleShaded(triangle, material, matrixProjection);
+        this->_DrawTriangleShadedPong(triangle, material, matrixProjection);
     }
 }
 
@@ -525,7 +627,8 @@ Matrix GenerateMatrixProjection(const Canvas &canvas, const Viewport &viewport)
 {
     double widthRatio = (viewport.depth * (canvas.GetWidthMax() - 1)) / viewport.width;
     double heightRatio = (viewport.depth * (canvas.GetHeightMax() - 1)) / viewport.height;
-    return Matrix({widthRatio, 0, 0, 0, 0, heightRatio, 0, 0, 0, 0, 1, 0}, 3, 4);
+    // make 4x4 to be invertable
+    return Matrix({widthRatio, 0, 0, 0, 0, heightRatio, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}, 4, 4);
 }
 
 vector<Instance> ClipInstancesAgainstPlanes(const vector<Instance> &instances, const array<Plane, 5> &clipPlanes)

@@ -81,7 +81,7 @@ class Engine {
             this.inputInfo.up,
             this.inputInfo.down,
             this.deltaTime);
-        this.rasterizer.Render();
+        this.rasterizer.Render(this.deltaTime);
         const draw = this.rasterizer.Draw();
         const array: number[] = [];
         for (let i = 0; i < draw.size(); i++){

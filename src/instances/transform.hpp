@@ -23,4 +23,5 @@ public:
     Vec3 GetScale() const;
 
     void SetTranslation(Vec3 value);
+    void SetRotation(Rotation value);
 };

@@ -18,3 +18,8 @@ void Transform::SetTranslation(Vec3 value)
     this->_translation = value;
 };
 Transform::Transform() : _translation(Vec3(0, 0, 0)), _rotation(Rotation(0, 0, 0)), _scale(Vec3(0, 0, 0)) {};
+
+void Transform::SetRotation(Rotation value)
+{
+    this->_rotation = value;
+}

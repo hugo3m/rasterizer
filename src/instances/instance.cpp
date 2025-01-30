@@ -55,3 +55,21 @@ vector<shared_ptr<Triangle>> Instance::GetRawTriangles() const
 {
     return this->_mesh->GetTriangles();
 };
+
+void Instance::AddUpdateBehavior(function<void(Instance &, const double deltaTime)> updateBehavior)
+{
+    this->_updateBehaviors.push_back(updateBehavior);
+};
+
+void Instance::Update(const double deltaTime)
+{
+    for (function<void(Instance &, const double deltaTime)> updateBehavior : this->_updateBehaviors)
+    {
+        updateBehavior(*this, deltaTime);
+    }
+};
+
+void Instance::SetTransform(Transform value)
+{
+    this->_transform = value;
+}

@@ -59,7 +59,7 @@ double LightPoint::GetLightingCoeff(const Material &material, const Vec3 &positi
     double coeff = 0;
     Vec3 lightToPosition = position - this->_position;
     coeff += this->Diffuse(lightToPosition, normal);
-    // coeff += this->Specular(material, lightToPosition, cameraPosition - position, normal);
+    coeff += this->Specular(material, lightToPosition, cameraPosition - position, normal);
     return coeff;
 };
 
@@ -82,6 +82,6 @@ double LightDirectional::GetLightingCoeff(const Material &material, const Vec3 &
 {
     double coeff = 0;
     coeff += this->Diffuse(this->_direction, normal);
-    // coeff += this->Specular(material, cameraPosition - position, normal);
+    coeff += this->Specular(material, cameraPosition - position, normal);
     return coeff;
 };

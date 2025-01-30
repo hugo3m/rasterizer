@@ -40,7 +40,9 @@ private:
 
     void _DrawTriangleFilled(const Triangle &triangle, const Material &material, const Matrix &matrixProjection);
 
-    void _DrawTriangleShaded(const Triangle &triangle, const Material &material, const Matrix &matrixProjection);
+    void _DrawTriangleShadedGoureau(const Triangle &triangle, const Material &material, const Matrix &matrixProjection);
+
+    void _DrawTriangleShadedPong(const Triangle &triangle, const Material &material, const Matrix &matrixProjection);
 
     // render
     void _RenderInstance(const Instance &instance);
@@ -57,7 +59,7 @@ public:
 
     void Input(bool forward, bool backward, bool left, bool right, bool up, bool down, double deltaTime);
 
-    void Render();
+    void Render(const double deltaTime);
 };
 
 Matrix GenerateMatrixProjection(const Canvas &canvas, const Viewport &viewport);
