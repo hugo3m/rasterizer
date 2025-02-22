@@ -5,11 +5,11 @@
 class Rotation
 {
 public:
-    double yaw;
-    double pitch;
-    double roll;
+    double x;
+    double y;
+    double z;
 
-    Rotation(double yaw, double pitch, double roll) : yaw(yaw), pitch(pitch), roll(roll) {};
+    Rotation(double x, double y, double z) : x(x), y(y), z(z) {};
 
     Matrix GenerateMatrixRotation() const;
 };

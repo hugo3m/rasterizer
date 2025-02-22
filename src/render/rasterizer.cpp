@@ -52,12 +52,33 @@ Rasterizer::Rasterizer() : _canvas(Canvas(200, 200)), _camera(Camera({1, 1, 1}, 
                          {
         Transform transform = instance.GetTransform();
         Rotation rotation = transform.GetRotation();
-        Rotation nextRotation = Rotation(rotation.yaw, rotation.pitch + (deltaTime * 0.5), rotation.roll);
+        Rotation nextRotation = Rotation(rotation.x + (deltaTime * 5), rotation.y, rotation.z);
         transform.SetRotation(nextRotation);
         instance.SetTransform(transform); });
 
     this->_instances.push_back(i1);
     this->_instances.push_back(i2);
+
+    // shared_ptr<Vec3> vv1 = make_shared<Vec3>(0, 0, 0);
+    // shared_ptr<Vec3> vv2 = make_shared<Vec3>(1, 0, 0);
+    // shared_ptr<Vec3> vv3 = make_shared<Vec3>(0, 1, 0);
+
+    // shared_ptr<Triangle> tt1 = make_shared<Triangle>(v1, v2, v3);
+
+    // shared_ptr<TriangleMesh> ttm1 = make_shared<TriangleMesh>(t1);
+
+    // double radian = 90 * M_PI / 180.0;
+
+    // Instance instance(ttm1, Transform(Vec3(0, 0, 0), Rotation(0, 0, radian), Vec3(1, 1, 1)), make_shared<Material>(RGBA(0, 255, 0, 255), 0, 0));
+
+    // Camera camera({1, 1, 1}, Transform(Vec3(0, 0, 0), Rotation(0, 0, 0), Vec3(0, 0, 0)));
+
+    // vector<shared_ptr<Triangle>> sceneTriangles = instance.GetSceneTriangles(camera.GenerateMatrixCamera());
+
+    // for (auto triangle : sceneTriangles)
+    // {
+    //     triangle->Print();
+    // }
 
     // lights
     this->_lights.push_back(make_shared<LightAmbient>(0.3));

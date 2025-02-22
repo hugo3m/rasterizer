@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include "math.h"
 #include "../src/meshes/cube.hpp"
 #include "../src/meshes/triangle.hpp"
 #include "../src/instances/instance.hpp"
@@ -105,4 +106,32 @@ TEST(InstanceTest, GetSceneTriangles)
     EXPECT_EQ(sceneTriangles.size(), 1);
 
     EXPECT_TRUE((*sceneTriangles[0]) == (*t1));
+}
+
+TEST(InstanceTest, GetSceneTriangles2)
+{
+    // The four "front" vertices
+    shared_ptr<Vec3> v1 = make_shared<Vec3>(0, 0, 0);
+    shared_ptr<Vec3> v2 = make_shared<Vec3>(1, 0, 0);
+    shared_ptr<Vec3> v3 = make_shared<Vec3>(0, 1, 0);
+    shared_ptr<Vec3> v4 = make_shared<Vec3>(1, 1, 0);
+
+    shared_ptr<Triangle> t1 = make_shared<Triangle>(v1, v2, v3);
+
+    shared_ptr<TriangleMesh> c1 = make_shared<TriangleMesh>(t1);
+
+    double radian = 90 * M_PI / 180.0;
+
+    Vec3 translation(0, 0, 0);
+    Instance instance(c1, Transform(translation, Rotation(0, 0, radian), Vec3(1, 1, 1)), make_shared<Material>(RGBA(0, 255, 0, 255), 0, 0));
+
+    Camera camera({1, 1, 1}, Transform(Vec3(0, 0, 0), Rotation(0, 0, 0), Vec3(0, 0, 0)));
+
+    vector<shared_ptr<Triangle>> sceneTriangles = instance.GetSceneTriangles(camera.GenerateMatrixCamera());
+
+    EXPECT_EQ(sceneTriangles.size(), 1);
+
+    shared_ptr<Triangle> t2 = make_shared<Triangle>(v1, v2, v4);
+
+    EXPECT_TRUE((*sceneTriangles[0]) == (*t2));
 }

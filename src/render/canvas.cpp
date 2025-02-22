@@ -63,6 +63,7 @@ void Canvas::SetPixelFromRGBA(int x, int y, double depth, RGBA rgba)
     {
         this->_SetDepthValue(x, y, depth);
         this->SetPixelFromRGBA(x, y, rgba);
+        this->_toCleanFlatIndexes.push_back(_GetPixelFlatIndex(x, y));
     }
 }
 
@@ -83,12 +84,11 @@ void Canvas::_SetDepthValue(int x, int y, double depth)
 
 void Canvas::Reset()
 {
-    for (int x = -this->GetWidthMax(); x < this->GetWidthMax(); x++)
+    while (!this->_toCleanFlatIndexes.empty())
     {
-        for (int y = -this->GetHeightMax(); y < this->GetHeightMax() - 1; y++)
-        {
-            this->_pixels[this->_GetPixelFlatIndex(x, y)].Set(RGBA(255, 255, 255, 255));
-            this->_depthBuffer[this->_GetPixelFlatIndex(x, y)] = 0;
-        }
+        const int toCleanFlatIndex = this->_toCleanFlatIndexes.back();
+        this->_pixels[toCleanFlatIndex].Set(RGBA(255, 255, 255, 255));
+        this->_depthBuffer[toCleanFlatIndex] = 0;
+        this->_toCleanFlatIndexes.pop_back();
     }
 }

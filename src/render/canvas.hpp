@@ -10,8 +10,10 @@ class Canvas
 private:
     int _height;
     int _width;
+
     vector<RGBA> _pixels;
     vector<double> _depthBuffer;
+    vector<int> _toCleanFlatIndexes;
 
     int _GetPixelFlatIndex(int x, int y) const;
 

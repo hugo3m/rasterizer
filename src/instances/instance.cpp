@@ -23,7 +23,7 @@ Matrix Instance::GenerateMatrixInstance() const
     Vec3 scale = this->_transform.GetScale();
     Matrix matrixTranslation = Matrix({1, 0, 0, translation.x, 0, 1, 0, translation.y, 0, 0, 1, translation.z, 0, 0, 0, 1}, 4, 4);
     Matrix matrixScale = Matrix({scale.x, 0, 0, 0, 0, scale.y, 0, 0, 0, 0, scale.z, 0, 0, 0, 0, 1}, 4, 4);
-    return matrixTranslation * matrixScale * this->_transform.GetRotation().GenerateMatrixRotation();
+    return matrixTranslation * (this->_transform.GetRotation().GenerateMatrixRotation() * matrixScale);
 }
 
 Sphere Instance::GetBoundingSphere() const
@@ -39,7 +39,7 @@ Sphere Instance::GetBoundingSphere() const
 vector<shared_ptr<Triangle>> Instance::GetSceneTriangles(const Matrix &matrixCamera) const
 {
     vector<shared_ptr<Triangle>> res;
-    Matrix matrixFactor = this->GenerateMatrixInstance() * matrixCamera;
+    Matrix matrixFactor = matrixCamera * this->GenerateMatrixInstance();
     vector<shared_ptr<Triangle>> triangles = this->GetMesh()->GetTriangles();
     for (auto triangle : triangles)
     {
