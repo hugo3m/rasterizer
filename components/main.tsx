@@ -10,6 +10,7 @@ export default function Test() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const [inputInfo, setInputInfo] = useState<Nullable<InputInfo>>(null);
+  const [fps, setFps] = useState<number>(0);
 
   useEffect(() => {
     const run = async () => {
@@ -18,7 +19,7 @@ export default function Test() {
       if (!ctx) return ;
       const CPP = await (await import('../lib/cpp.js')).default();
       const rasterizer = new CPP.Rasterizer();
-      Engine.create(rasterizer, canvasRef.current, 200, 200, () => {}, setInputInfo);
+      Engine.create(rasterizer, canvasRef.current, 200, 200, setFps, setInputInfo);
     };
     run();
     return () => {
@@ -38,6 +39,7 @@ export default function Test() {
             </p>
         </div>
         <div className="flex flex-2 flex-col max-w-[30vw] min-w-[30vw]">
+          <p>FPS: {fps.toFixed(0)}</p>
           <canvas ref={canvasRef} width={600} height={600}/>
         </div>
         </div>

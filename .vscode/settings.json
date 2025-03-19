@@ -89,5 +89,6 @@
     "stop_token": "cpp",
     "cinttypes": "cpp",
     "typeindex": "cpp"
-  }
+  },
+  "C_Cpp.default.compilerPath": "/usr/bin/clang++"
 }
