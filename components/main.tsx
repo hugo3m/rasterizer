@@ -3,31 +3,44 @@
 import Engine, {InputInfo} from "../utils/engine";
 import { useEffect, useRef, useState } from 'react';
 
+import { MainModule, DrawingMethod } from "../lib/cpp.js";
+
 import { Nullable } from '@/utils/type';
+import { useCpp } from "@/utils/hooks/useCpp";
 
 export default function Test() {
 
+  // render
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
+  // state
+  const [drawingMethod, setDrawingMethod] = useState<DrawingMethod | null>(null); 
   const [inputInfo, setInputInfo] = useState<Nullable<InputInfo>>(null);
   const [fps, setFps] = useState<number>(0);
 
+  const cpp = useCpp();
+
   useEffect(() => {
     const run = async () => {
+      if(!cpp) return;
       if (!canvasRef.current) return;
       const ctx = canvasRef.current.getContext("2d");
       if (!ctx) return ;
-      const CPP = await (await import('../lib/cpp.js')).default();
-      const rasterizer = new CPP.Rasterizer();
+      const rasterizer = new cpp.Rasterizer();
       Engine.create(rasterizer, canvasRef.current, 200, 200, setFps, setInputInfo);
     };
     run();
     return () => {
         Engine.destroy();
     }
-  }, []);
+  }, [cpp]);
+
+
 
   return (
+    !cpp ? <div>
+      <p>Loading...</p>
+    </div>
+    : 
     <div className="flex flex-1 flex-col">
       <div className="flex flex-row justify-center">
         <div className="flex flex-1 flex-col p-12">
@@ -42,6 +55,9 @@ export default function Test() {
           <p>FPS: {fps.toFixed(0)}</p>
           <canvas ref={canvasRef} width={600} height={600}/>
         </div>
+        {/* <div className="flex flex-1 flex-col p-12">
+          {drawingMethodValues.length > 0 ? <Select options={drawingMethodValues.map((value) => ({option: value, label: value.value}))}/> : null}
+        </div> */}
         </div>
       </div>
     );

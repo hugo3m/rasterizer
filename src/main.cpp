@@ -5,6 +5,7 @@
 #include <emscripten/bind.h>
 
 #include "render/rasterizer.hpp"
+#include "enums.hpp"
 
 using namespace std;
 
@@ -22,6 +23,9 @@ EMSCRIPTEN_BINDINGS(module)
         .function("Input", &Rasterizer::Input)
         .function("Render", &Rasterizer::Render)
         .function("Draw", &Rasterizer::Draw);
+    emscripten::enum_<DrawingMethod>("DrawingMethod")
+        .value("WIREFRAMED", DrawingMethod::WIREFRAMED)
+        .value("FILLED", DrawingMethod::FILLED);
     // register bindings for std::vector<int>, std::map<int, std::string>, and
     // std::optional<std::string>.
     emscripten::register_vector<int>("vector<int>");
