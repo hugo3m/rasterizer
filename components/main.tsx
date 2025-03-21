@@ -17,7 +17,7 @@ export default function Test() {
   const [inputInfo, setInputInfo] = useState<Nullable<InputInfo>>(null);
   const [fps, setFps] = useState<number>(0);
 
-  const cpp = useCpp();
+  const cpp: MainModule | undefined = useCpp();
 
   useEffect(() => {
     const run = async () => {
@@ -37,10 +37,7 @@ export default function Test() {
 
 
   return (
-    !cpp ? <div>
-      <p>Loading...</p>
-    </div>
-    : 
+    
     <div className="flex flex-1 flex-col">
       <div className="flex flex-row justify-center">
         <div className="flex flex-1 flex-col p-12">
@@ -52,8 +49,15 @@ export default function Test() {
             </p>
         </div>
         <div className="flex flex-2 flex-col max-w-[30vw] min-w-[30vw]">
+        {!cpp ? <div>
+            <p>Loading...</p>
+          </div>
+            : 
+          <>
           <p>FPS: {fps.toFixed(0)}</p>
           <canvas ref={canvasRef} width={600} height={600}/>
+          </>
+        }
         </div>
         {/* <div className="flex flex-1 flex-col p-12">
           {drawingMethodValues.length > 0 ? <Select options={drawingMethodValues.map((value) => ({option: value, label: value.value}))}/> : null}

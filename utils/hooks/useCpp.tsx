@@ -3,14 +3,14 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { MainModule } from "@/lib/cpp.js";
 
-const CppContext = createContext<MainModule | null>(null);
+const CppContext = createContext<MainModule | undefined>(undefined);
 
 interface CppProviderProps {
   children: ReactNode;
 }
 
 const CppProvider = ({ children }: CppProviderProps) => {
-  const [module, setModule] = useState<MainModule | null>(null);
+  const [module, setModule] = useState<MainModule | undefined>(undefined);
 
   useEffect(() => {
     const init = async () => {
@@ -27,7 +27,7 @@ const CppProvider = ({ children }: CppProviderProps) => {
   );
 };
 
-const useCpp = (): MainModule | null => {
+const useCpp = (): MainModule | undefined => {
   const context = useContext(CppContext);
   return context;
 };
