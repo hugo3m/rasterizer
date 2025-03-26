@@ -9,6 +9,9 @@
 
 using namespace std;
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "includes/stb_image.h"
+
 #include <sys/stat.h>
 
 bool fileExists(const char *path)
@@ -19,14 +22,27 @@ bool fileExists(const char *path)
 
 int main()
 {
-    if (fileExists("assets/crate-texture.jpg"))
+    const char *path = "assets/crate-texture.jpg";
+
+    if (!fileExists(path))
     {
-        printf("File exists!!!\n");
+        printf("❌ File not found: \n");
+        return 1;
     }
-    else
+
+    int width, height, channels;
+    unsigned char *data = stbi_load(path, &width, &height, &channels, 0);
+
+    if (!data)
     {
-        printf("❌ File NOT found!\n");
+        printf("❌ Failed to load image: \n");
+        return 1;
     }
+
+    printf("Image loaded!! \n");
+
+    stbi_image_free(data);
+    return 0;
 }
 
 EMSCRIPTEN_BINDINGS(module)
