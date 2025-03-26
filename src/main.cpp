@@ -9,11 +9,24 @@
 
 using namespace std;
 
+#include <sys/stat.h>
+
+bool fileExists(const char *path)
+{
+    struct stat buffer;
+    return stat(path, &buffer) == 0;
+}
+
 int main()
 {
-    srand(time(0));
-    printf("Hello World\n");
-    return 0;
+    if (fileExists("assets/crate-texture.jpg"))
+    {
+        printf("File exists!!!\n");
+    }
+    else
+    {
+        printf("❌ File NOT found!\n");
+    }
 }
 
 EMSCRIPTEN_BINDINGS(module)

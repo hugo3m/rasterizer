@@ -1,5 +1,6 @@
 "use client";
 
+import cppDataUrl from '../../lib/cpp.data'; // Webpack will emit this!
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { MainModule } from "@/lib/cpp.js";
 
@@ -14,8 +15,18 @@ const CppProvider = ({ children }: CppProviderProps) => {
 
   useEffect(() => {
     const init = async () => {
-      const mainModule: MainModule = await (await import('../../lib/cpp.js')).default();
-      setModule(mainModule);
+      // Dynamically load the Emscripten module from the public folder
+      const ModuleFactory = await import('../../lib/cpp.js'); // ⬅️ Load directly from /public
+
+      const moduleInstance: MainModule = await ModuleFactory.default({
+        locateFile: (path: string) => {
+          if (path.endsWith('.data')) {
+            return cppDataUrl;
+          }
+          return path;
+        }
+      });
+      setModule(moduleInstance);
     };
     init();
   }, []);

@@ -29,6 +29,7 @@ set(EMCC_ARGS
   -sNO_DISABLE_EXCEPTION_CATCHING
   # -sMAXIMUM_MEMORY=4GB
   -s -lembind
+  --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/assets@assets
 )
 
 # define subdirectory
