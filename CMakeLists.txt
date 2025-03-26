@@ -27,6 +27,7 @@ set(EMCC_ARGS
   -sSINGLE_FILE=1
   -sALLOW_MEMORY_GROWTH=1
   -sNO_DISABLE_EXCEPTION_CATCHING
+  -O3
   # -sMAXIMUM_MEMORY=4GB
   -s -lembind
   --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/assets@assets

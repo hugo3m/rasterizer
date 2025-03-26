@@ -52,7 +52,7 @@ Rasterizer::Rasterizer() : _canvas(Canvas(200, 200)), _camera(Camera({1, 1, 1}, 
                          {
         Transform transform = instance.GetTransform();
         Rotation rotation = transform.GetRotation();
-        Rotation nextRotation = Rotation(rotation.x + (deltaTime * 5), rotation.y, rotation.z);
+        Rotation nextRotation = Rotation(rotation.x + (deltaTime * 15), rotation.y, rotation.z);
         transform.SetRotation(nextRotation);
         instance.SetTransform(transform); });
 
