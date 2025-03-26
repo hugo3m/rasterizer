@@ -15,8 +15,7 @@ const CppProvider = ({ children }: CppProviderProps) => {
 
   useEffect(() => {
     const init = async () => {
-      // Dynamically load the Emscripten module from the public folder
-      const ModuleFactory = await import('../../lib/cpp.js'); // ⬅️ Load directly from /public
+      const ModuleFactory = await import('../../lib/cpp.js');
 
       const moduleInstance: MainModule = await ModuleFactory.default({
         locateFile: (path: string) => {
