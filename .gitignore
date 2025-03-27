@@ -1,7 +1,10 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # cpp
-# /lib
+lib/**/*
+!lib/cpp.js
+!lib/cpp.data
+!lib/cpp.d.ts
 Makefile
 CMakeFiles
 cmake_install.cmake
