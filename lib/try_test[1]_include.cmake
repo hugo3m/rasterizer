@@ -1,0 +1,5 @@
+if(EXISTS "/Users/hugomartineau/Documents/Perso/Applications/rasterizer/lib/try_test[1]_tests.cmake")
+  include("/Users/hugomartineau/Documents/Perso/Applications/rasterizer/lib/try_test[1]_tests.cmake")
+else()
+  add_test(try_test_NOT_BUILT try_test_NOT_BUILT)
+endif()
