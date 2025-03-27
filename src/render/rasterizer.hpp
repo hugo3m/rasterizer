@@ -53,7 +53,7 @@ private:
     double _GetLightingCoeff(const Vec3 &position, const Vec3 &normal, const Material &material) const;
 
 public:
-    Rasterizer();
+    Rasterizer(const int height, const int width);
 
     vector<int> Draw() const;
 

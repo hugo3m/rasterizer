@@ -88,6 +88,7 @@ class Engine {
             array.push(draw.get(i) as number);
         }
         ctx.putImageData(new ImageData(new Uint8ClampedArray(array), this.width, this.height), 0, 0);
+        draw.delete();
         const elapsedTimeMs: number = Date.now() - startTime;
         const minTimeMs = (1 / this.refreshRate) * 1000;
         const timeToWait = minTimeMs > elapsedTimeMs ? minTimeMs - elapsedTimeMs : 0;
