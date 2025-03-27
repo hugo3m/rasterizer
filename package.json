@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "nodemon",
-    "build": "rm -rf lib && cmake -B lib && cmake --build lib && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "test": "rm -rf lib && cmake -B lib && cmake --build lib && cd lib && ctest --output-on-failure && cd .."
