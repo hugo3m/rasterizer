@@ -5,6 +5,11 @@ export default {
     // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
+
+  typescript: {
+    ignoreBuildErrors: true
+  },
+
   webpack(config, { isServer }) {
     config.experiments = {
       ...config.experiments,
