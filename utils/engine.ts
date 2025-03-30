@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from "react";
 import { Nullable } from "./type";
 
-import { Rasterizer } from "../lib/cpp";
+import { Rasterizer, ShadingMethod } from "../lib/cpp";
 
 enum Event {
     Up = 1,
@@ -26,8 +26,8 @@ class Engine {
     inputInfo: InputInfo;
     rasterizer: Rasterizer;
     refreshRate: number;
-    setFps: Dispatch<SetStateAction<number>>
-    setInputInfo: Dispatch<SetStateAction<Nullable<InputInfo>>>
+    setFps: Dispatch<SetStateAction<number>>;
+    setInputInfo: Dispatch<SetStateAction<Nullable<InputInfo>>>;
     width: number;
     isDestroyed: boolean;
 

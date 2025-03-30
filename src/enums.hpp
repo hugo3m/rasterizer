@@ -1,8 +1,9 @@
-enum class DrawingMethod
+#pragma once
+
+enum class ShadingMethod
 {
     WIREFRAMED,
-    FILLED,
-    SHADED,
-    GOUREAU_SHADED,
-    PONG_SHADED
+    FLAT_SHADING,
+    GOUREAU_SHADING,
+    PONG_SHADING,
 };

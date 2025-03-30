@@ -10,12 +10,15 @@
 #include "../math/matrix.hpp"
 #include "../instances/camera.hpp"
 #include "../instances/light.hpp"
+#include "../enums.hpp"
 
 using namespace std;
 
 class Rasterizer
 {
 private:
+    ShadingMethod _shadingMethod;
+
     Canvas _canvas;
     Camera _camera;
 
@@ -40,6 +43,8 @@ private:
 
     void _DrawTriangleFilled(const Triangle &triangle, const Material &material, const Matrix &matrixProjection);
 
+    void _DrawTriangleShaded(const Triangle &triangle, const Material &material, const Matrix &matrixProjection);
+
     void _DrawTriangleShadedGoureau(const Triangle &triangle, const Material &material, const Matrix &matrixProjection);
 
     void _DrawTriangleShadedPong(const Triangle &triangle, const Material &material, const Matrix &matrixProjection);
@@ -53,7 +58,7 @@ private:
     double _GetLightingCoeff(const Vec3 &position, const Vec3 &normal, const Material &material) const;
 
 public:
-    Rasterizer(const int height, const int width);
+    Rasterizer(const int height, const int width, const ShadingMethod shadingMethod);
 
     vector<int> Draw() const;
 

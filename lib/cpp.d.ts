@@ -37,10 +37,10 @@ export interface Rasterizer extends ClassHandle {
   Render(_0: number): void;
 }
 
-export interface DrawingMethodValue<T extends number> {
+export interface ShadingMethodValue<T extends number> {
   value: T;
 }
-export type DrawingMethod = DrawingMethodValue<0>|DrawingMethodValue<1>;
+export type ShadingMethod = ShadingMethodValue<0>|ShadingMethodValue<1>|ShadingMethodValue<2>|ShadingMethodValue<3>;
 
 export interface vector<int> extends ClassHandle {
   push_back(_0: number): void;
@@ -52,9 +52,9 @@ export interface vector<int> extends ClassHandle {
 
 interface EmbindModule {
   Rasterizer: {
-    new(_0: number, _1: number): Rasterizer;
+    new(_0: number, _1: number, _2: ShadingMethod): Rasterizer;
   };
-  DrawingMethod: {WIREFRAMED: DrawingMethodValue<0>, FILLED: DrawingMethodValue<1>};
+  ShadingMethod: {WIREFRAMED: ShadingMethodValue<0>, FLAT_SHADING: ShadingMethodValue<1>, GOUREAU_SHADING: ShadingMethodValue<2>, PONG_SHADING: ShadingMethodValue<3>};
   vector<int>: {
     new(): vector<int>;
   };

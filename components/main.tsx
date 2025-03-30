@@ -3,9 +3,14 @@
 import Engine, {InputInfo} from "../utils/engine";
 import { useEffect, useRef, useState } from 'react';
 
-import { MainModule, DrawingMethod } from "../lib/cpp.js";
+import { MainModule, ShadingMethod } from "../lib/cpp.js";
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Box from '@mui/material/Box';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 
-import { Nullable } from '@/utils/type';
+import { Nullable, SelectAttr } from '@/utils/type';
 import { useCpp } from "@/utils/hooks/useCpp";
 import Slider from '@mui/material/Slider';
 import Input from "./input";
@@ -16,26 +21,60 @@ export default function Test() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   // state
   const [pixels, setPixels] = useState<number>(600);
-  const [drawingMethod, setDrawingMethod] = useState<DrawingMethod | null>(null); 
+  const [shadingMethods, setShadingMethods] = useState<SelectAttr<ShadingMethod>[]>([]);
+  const [shadingMethod, setShadingMethod] = useState<Nullable<SelectAttr<ShadingMethod>>>(null); 
   const [inputInfo, setInputInfo] = useState<Nullable<InputInfo>>(null);
   const [fps, setFps] = useState<number>(0);
 
   const cpp: MainModule | undefined = useCpp();
+
+  const createShadingMethod = (dMeth: ShadingMethod): SelectAttr<ShadingMethod> => {
+    if(!cpp) throw Error('createShadingMethod: cpp undefined');
+    switch(dMeth){
+      case cpp.ShadingMethod.FLAT_SHADING:
+        return { value: dMeth, label: "Flat shading"};
+      case cpp.ShadingMethod.GOUREAU_SHADING:
+        return { value: dMeth, label: "Goureau shading"};
+      case cpp.ShadingMethod.PONG_SHADING:
+        return { value: dMeth, label: "Pong shading"};
+      case cpp.ShadingMethod.WIREFRAMED:
+        return { value: dMeth, label: "Wireframed"}; 
+      default:
+        return { value: dMeth, label: "Pong shading"};
+    }
+  };
+
+  useEffect(() => {
+    const init = async () => {
+      if(!cpp) return;
+      
+      setShadingMethods([createShadingMethod(cpp.ShadingMethod.FLAT_SHADING),
+        createShadingMethod(cpp.ShadingMethod.GOUREAU_SHADING),
+        createShadingMethod(cpp.ShadingMethod.PONG_SHADING),
+        createShadingMethod(cpp.ShadingMethod.WIREFRAMED),
+       ]);
+      setShadingMethod(createShadingMethod(cpp.ShadingMethod.GOUREAU_SHADING));
+      console.log("init");
+    };
+    init();
+  }, [cpp]);
 
   useEffect(() => {
     const run = async () => {
       if(!cpp) return;
       if (!canvasRef.current) return;
       const ctx = canvasRef.current.getContext("2d");
-      if (!ctx) return ;
-      const rasterizer = new cpp.Rasterizer(pixels, pixels);
+      if (!ctx) return;
+      if (!shadingMethod) return;
+      const rasterizer = new cpp.Rasterizer(pixels, pixels, shadingMethod.value);
       Engine.create(rasterizer, canvasRef.current, pixels, pixels, setFps, setInputInfo);
+      console.log("run");
     };
     run();
     return () => {
-        Engine.destroy();
+      Engine.destroy();
     }
-  }, [cpp, pixels]);
+  }, [cpp, pixels, shadingMethod]);
 
 
 
@@ -75,16 +114,49 @@ export default function Test() {
         }
         </div>
         <div className="flex flex-1 flex-col p-12">
-          <span>Number of pixels width and height</span>
-          <Slider
-              value={pixels}
-              onChange={(event, value) => setPixels(value as number)}
-              marks
-              valueLabelDisplay="auto"
-              min={100}
-              step={100}
-              max={1000}
-          />
+          <div>
+            <span>Number of pixels width and height</span>
+            <Slider
+                value={pixels}
+                onChange={(event, value) => setPixels(value as number)}
+                marks
+                valueLabelDisplay="auto"
+                min={100}
+                step={100}
+                max={1000}
+            />
+          </div>
+          <div>
+          {shadingMethods.length > 0 && shadingMethod !== null ? <Box sx={{ minWidth: 120 }}>
+            <FormControl fullWidth>
+              <InputLabel id="demo-simple-select-label" sx={{ color: 'white' }}>Shading method</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  value={shadingMethod.value}
+                  label="Shading method"
+                  onChange={(event) => {setShadingMethod(createShadingMethod(event.target.value as ShadingMethod));}}
+                  sx={{
+                    color: 'white',
+                    '.MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'white',
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'white',
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'white',
+                    },
+                    '.MuiSvgIcon-root': {
+                      color: 'white',
+                    },
+                  }}
+                >
+                  {shadingMethods.map((d, index) => <MenuItem key={index} value={d.value}>{d.label}</MenuItem>)}
+                </Select>
+            </FormControl>
+          </Box>: null}
+          </div>
         </div>
         </div>
       </div>
