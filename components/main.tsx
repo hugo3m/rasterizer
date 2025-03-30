@@ -129,7 +129,7 @@ export default function Test() {
           <div>
           {shadingMethods.length > 0 && shadingMethod !== null ? <Box sx={{ minWidth: 120 }}>
             <FormControl fullWidth>
-              <InputLabel id="demo-simple-select-label" sx={{ color: 'white' }}>Shading method</InputLabel>
+              <InputLabel id="demo-simple-select-label" sx={{ color: '#1876d1' }}>Shading method</InputLabel>
                 <Select
                   labelId="demo-simple-select-label"
                   id="demo-simple-select"
@@ -137,18 +137,18 @@ export default function Test() {
                   label="Shading method"
                   onChange={(event) => {setShadingMethod(createShadingMethod(event.target.value as ShadingMethod));}}
                   sx={{
-                    color: 'white',
+                    color: '#1876d1',
                     '.MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'white',
+                      borderColor: '#1876d1',
                     },
                     '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'white',
+                      borderColor: '#1876d1',
                     },
                     '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'white',
+                      borderColor: '#1876d1',
                     },
                     '.MuiSvgIcon-root': {
-                      color: 'white',
+                      color: '#1876d1',
                     },
                   }}
                 >
