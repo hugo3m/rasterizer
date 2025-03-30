@@ -53,7 +53,7 @@ export default function Test() {
         createShadingMethod(cpp.ShadingMethod.PONG_SHADING),
         createShadingMethod(cpp.ShadingMethod.WIREFRAMED),
        ]);
-      setShadingMethod(createShadingMethod(cpp.ShadingMethod.GOUREAU_SHADING));
+      setShadingMethod(createShadingMethod(cpp.ShadingMethod.PONG_SHADING));
       console.log("init");
     };
     init();

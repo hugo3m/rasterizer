@@ -47,6 +47,8 @@ Rasterizer::Rasterizer(const int height, const int width, const ShadingMethod sh
     // the cube instance
     Instance i1 = Instance(c1, Transform(Vec3(0, 0, 5), Rotation(0, 0, 0), Vec3(1, 1, 1)), make_shared<Material>(RGBA(0, 255, 0, 255), 500, 0));
     Instance i2 = Instance(c1, Transform(Vec3(0, -2.5, 5), Rotation(0, 0, 0), Vec3(1, 0.1, 1)), make_shared<Material>(RGBA(151, 99, 71, 255), 0, 0));
+    Instance i3 = Instance(c1, Transform(Vec3(-5, 0, 10), Rotation(0, 20, 40), Vec3(1, 1, 1)), make_shared<Material>(RGBA(255, 0, 0, 255), 0, 0));
+    Instance i4 = Instance(c1, Transform(Vec3(9, 0, 15), Rotation(10, 60, 34), Vec3(2, 2, 2)), make_shared<Material>(RGBA(255, 0, 255, 255), 0, 0));
 
     i1.AddUpdateBehavior([](Instance &instance, const double deltaTime)
                          {
@@ -56,8 +58,26 @@ Rasterizer::Rasterizer(const int height, const int width, const ShadingMethod sh
         transform.SetRotation(nextRotation);
         instance.SetTransform(transform); });
 
+    i3.AddUpdateBehavior([](Instance &instance, const double deltaTime)
+                         {
+            Transform transform = instance.GetTransform();
+            Rotation rotation = transform.GetRotation();
+            Rotation nextRotation = Rotation(rotation.x + (deltaTime * 15), rotation.y + (deltaTime * 15), rotation.z);
+            transform.SetRotation(nextRotation);
+            instance.SetTransform(transform); });
+
+    i4.AddUpdateBehavior([](Instance &instance, const double deltaTime)
+                         {
+            Transform transform = instance.GetTransform();
+            Rotation rotation = transform.GetRotation();
+            Rotation nextRotation = Rotation(rotation.x + (deltaTime * 15), rotation.y, rotation.z + (deltaTime * 15));
+            transform.SetRotation(nextRotation);
+            instance.SetTransform(transform); });
+
     this->_instances.push_back(i1);
     this->_instances.push_back(i2);
+    this->_instances.push_back(i3);
+    this->_instances.push_back(i4);
 
     // shared_ptr<Vec3> vv1 = make_shared<Vec3>(0, 0, 0);
     // shared_ptr<Vec3> vv2 = make_shared<Vec3>(1, 0, 0);
