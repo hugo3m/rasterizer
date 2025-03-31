@@ -33,6 +33,7 @@ export interface ClassHandle {
 }
 export interface Rasterizer extends ClassHandle {
   Draw(): vector<int>;
+  DrawNative(): number;
   Input(_0: boolean, _1: boolean, _2: boolean, _3: boolean, _4: boolean, _5: boolean, _6: number): void;
   Render(_0: number): void;
 }
@@ -58,6 +59,7 @@ interface EmbindModule {
   vector<int>: {
     new(): vector<int>;
   };
+  freeBuffer(_0: number): void;
 }
 
 export type MainModule = WasmModule & typeof RuntimeExports & EmbindModule;

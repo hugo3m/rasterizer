@@ -54,7 +54,6 @@ export default function Test() {
         createShadingMethod(cpp.ShadingMethod.WIREFRAMED),
        ]);
       setShadingMethod(createShadingMethod(cpp.ShadingMethod.PONG_SHADING));
-      console.log("init");
     };
     init();
   }, [cpp]);
@@ -67,8 +66,7 @@ export default function Test() {
       if (!ctx) return;
       if (!shadingMethod) return;
       const rasterizer = new cpp.Rasterizer(pixels, pixels, shadingMethod.value);
-      Engine.create(rasterizer, canvasRef.current, pixels, pixels, setFps, setInputInfo);
-      console.log("run");
+      Engine.create(rasterizer, cpp, canvasRef.current, pixels, pixels, setFps, setInputInfo);
     };
     run();
     return () => {

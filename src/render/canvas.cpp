@@ -26,6 +26,20 @@ vector<int> Canvas::Render() const
     return res;
 }
 
+uint8_t *Canvas::RenderNative() const
+{
+    uint8_t *res = new uint8_t[this->_pixels.size() * 4];
+    for (int i = 0; i < this->_pixels.size(); i++)
+    {
+        array<int, 4> flat = this->_pixels[i].Unpack();
+        res[(i * 4) + 0] = static_cast<uint8_t>(flat[0]);
+        res[(i * 4) + 1] = static_cast<uint8_t>(flat[1]);
+        res[(i * 4) + 2] = static_cast<uint8_t>(flat[2]);
+        res[(i * 4) + 3] = static_cast<uint8_t>(flat[3]);
+    }
+    return res;
+}
+
 int Canvas::_GetPixelFlatIndex(int x, int y) const
 {
     int x_index = x + this->GetWidthMax();

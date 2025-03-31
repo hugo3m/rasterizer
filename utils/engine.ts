@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from "react";
 import { Nullable } from "./type";
 
-import { Rasterizer, ShadingMethod } from "../lib/cpp";
+import { Rasterizer, MainModule } from "../lib/cpp";
 
 enum Event {
     Up = 1,
@@ -20,6 +20,7 @@ type InputInfo = {
 class Engine {
     static _instance?: Engine;
 
+    cpp: MainModule;
     canvas: HTMLCanvasElement;
     height: number;
     deltaTime: number;
@@ -31,9 +32,10 @@ class Engine {
     width: number;
     isDestroyed: boolean;
 
-    private constructor(rasterizer: Rasterizer, canvas: HTMLCanvasElement, width: number, height: number, setFps: Dispatch<SetStateAction<number>>, setInputInfo: Dispatch<SetStateAction<Nullable<InputInfo>>>) {
+    private constructor(rasterizer: Rasterizer, cpp: MainModule, canvas: HTMLCanvasElement, width: number, height: number, setFps: Dispatch<SetStateAction<number>>, setInputInfo: Dispatch<SetStateAction<Nullable<InputInfo>>>) {
         this.rasterizer = rasterizer;
         this.canvas = canvas;
+        this.cpp = cpp;
         this.width = width;
         this.height = height;
         this.inputInfo = {forward: false, backward: false, left:false, right:false, up:false, down: false};
@@ -53,9 +55,9 @@ class Engine {
         });
     }
 
-    public static create(rasterizer: Rasterizer, canvas: HTMLCanvasElement, width: number, height: number, setFps: Dispatch<SetStateAction<number>>, setInputInfo: Dispatch<SetStateAction<Nullable<InputInfo>>>) {
+    public static create(rasterizer: Rasterizer, cpp: MainModule, canvas: HTMLCanvasElement, width: number, height: number, setFps: Dispatch<SetStateAction<number>>, setInputInfo: Dispatch<SetStateAction<Nullable<InputInfo>>>) {
         if (!Engine._instance) {
-            Engine._instance = new Engine(rasterizer, canvas, width, height, setFps, setInputInfo);
+            Engine._instance = new Engine(rasterizer, cpp, canvas, width, height, setFps, setInputInfo);
         }
     }
 
@@ -82,14 +84,12 @@ class Engine {
             this.inputInfo.down,
             this.deltaTime);
         this.rasterizer.Render(this.deltaTime);
-        const draw = this.rasterizer.Draw();
-        const array: number[] = [];
-        for (let i = 0; i < draw.size(); i++){
-            array.push(draw.get(i) as number);
-        }
-        ctx.putImageData(new ImageData(new Uint8ClampedArray(array), this.width, this.height), 0, 0);
-        draw.delete();
-        const elapsedTimeMs: number = Date.now() - startTime;
+        const ptr: number = this.rasterizer.DrawNative();
+        const image = new Uint8ClampedArray(this.cpp.HEAPU8.buffer, ptr, this.width * this.height * 4);
+        ctx.putImageData(new ImageData(image, this.width, this.height), 0, 0);
+        this.cpp.freeBuffer(ptr);
+        const endTime: number = Date.now();
+        const elapsedTimeMs: number = endTime - startTime;
         const minTimeMs = (1 / this.refreshRate) * 1000;
         const timeToWait = minTimeMs > elapsedTimeMs ? minTimeMs - elapsedTimeMs : 0;
         this.deltaTime = (elapsedTimeMs + timeToWait) / 1000;

@@ -62,6 +62,8 @@ public:
 
     vector<int> Draw() const;
 
+    uintptr_t DrawNative() const;
+
     void Input(bool forward, bool backward, bool left, bool right, bool up, bool down, double deltaTime);
 
     void Render(const double deltaTime);

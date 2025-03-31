@@ -113,6 +113,11 @@ vector<int> Rasterizer::Draw() const
     return this->_canvas.Render();
 }
 
+uintptr_t Rasterizer::DrawNative() const
+{
+    return reinterpret_cast<uintptr_t>(this->_canvas.RenderNative());
+}
+
 void Rasterizer::_DrawLine(const Vec2 &from, const Vec2 &to, const RGBA &color)
 {
 

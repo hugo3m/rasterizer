@@ -26,6 +26,8 @@ public:
 
     vector<int> Render() const;
 
+    uint8_t *RenderNative() const;
+
     void Reset();
 
     int GetWidthMax() const;
