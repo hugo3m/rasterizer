@@ -119,9 +119,9 @@ export default function Test() {
                 onChange={(event, value) => setPixels(value as number)}
                 marks
                 valueLabelDisplay="auto"
-                min={100}
-                step={100}
-                max={1000}
+                min={400}
+                step={200}
+                max={1200}
             />
           </div>
           <div>
