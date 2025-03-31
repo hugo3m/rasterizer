@@ -408,7 +408,7 @@ void Rasterizer::_DrawTriangleShaded(Vec2 p1, Vec2 p2, Vec2 p3, const RGBA &colo
     }
 }
 
-void Rasterizer::_DrawTriangleShaded(const Triangle &triangle, const Material &material, const Matrix &matrixProjection)
+void Rasterizer::_DrawTriangleShadedFlat(const Triangle &triangle, const Material &material, const Matrix &matrixProjection)
 {
     array<shared_ptr<Vec3>, 3> vertices = triangle.GetVertices();
     Vec3 v1 = *vertices[0];
@@ -429,18 +429,10 @@ void Rasterizer::_DrawTriangleShaded(const Triangle &triangle, const Material &m
         std::swap(p1, p3);
     if (p3.y < p2.y)
         std::swap(p2, p3);
-    // arbitrarly choose vertex intensity
-    double i1 = 1;
-    double i2 = 0.5;
-    double i3 = 0;
     // interpolate xs for every sides
     vector<double> xs12 = InterpLinear(p1.x, p2.x, p2.y - p1.y);
     vector<double> xs13 = InterpLinear(p1.x, p3.x, p3.y - p1.y);
     vector<double> xs23 = InterpLinear(p2.x, p3.x, p3.y - p2.y);
-    // interpolate intensity for every height
-    vector<double> is12 = InterpLinear(i1, i2, p2.y - p1.y);
-    vector<double> is13 = InterpLinear(i1, i3, p3.y - p1.y);
-    vector<double> is23 = InterpLinear(i2, i3, p3.y - p2.y);
     // interpolate zs for every sides
     vector<double> zs12 = InterpLinear(1 / v1.z, 1 / v2.z, xs12.size());
     vector<double> zs13 = InterpLinear(1 / v1.z, 1 / v3.z, xs13.size());
@@ -449,10 +441,6 @@ void Rasterizer::_DrawTriangleShaded(const Triangle &triangle, const Material &m
     vector<double> xs1223;
     xs1223.insert(xs1223.end(), xs12.begin(), xs12.end() - 1);
     xs1223.insert(xs1223.end(), xs23.begin(), xs23.end());
-    // merge small intensity together
-    vector<double> is1223;
-    is1223.insert(is1223.end(), is12.begin(), is12.end() - 1);
-    is1223.insert(is1223.end(), is23.begin(), is23.end());
     // merge small sides together for zs
     vector<double> zs1223;
     zs1223.insert(zs1223.end(), zs12.begin(), zs12.end() - 1);
@@ -460,8 +448,6 @@ void Rasterizer::_DrawTriangleShaded(const Triangle &triangle, const Material &m
     // find left and right side
     vector<double> xsLeft;
     vector<double> xsRight;
-    vector<double> isLeft;
-    vector<double> isRight;
     vector<double> zsLeft;
     vector<double> zsRight;
     int middle = std::floor(xs1223.size() / 2);
@@ -471,8 +457,6 @@ void Rasterizer::_DrawTriangleShaded(const Triangle &triangle, const Material &m
         xsRight = xs1223;
         zsLeft = zs13;
         zsRight = zs1223;
-        isLeft = is13;
-        isRight = is1223;
     }
     else
     {
@@ -480,29 +464,24 @@ void Rasterizer::_DrawTriangleShaded(const Triangle &triangle, const Material &m
         xsRight = xs13;
         zsLeft = zs1223;
         zsRight = zs13;
-        isLeft = is1223;
-        isRight = is13;
     }
+    // get lighting coeff
+    double i = this->_GetLightingCoeff((v1 / 3) + (v2 / 3) + (v3 / 3), triangle.GetNormal(), material);
     // for every y from bottom to top
     for (int y = p1.y; y < p3.y; y++)
     {
         // retrieve left, right side
         double xLeft = xsLeft[y - p1.y];
         double xRight = xsRight[y - p1.y];
-        // retrieve insity left and right
-        double iLeft = isLeft[y - p1.y];
-        double iRight = isRight[y - p1.y];
         // retrieve left, right for zs
         double zLeft = zsLeft[y - p1.y];
         double zRight = zsRight[y - p1.y];
-        // interpolate intensity from left to right
-        vector<double> is = InterpLinear(iLeft, iRight, xRight - xLeft);
         // interpolate a z depth from left to right
         vector<double> zSegment = InterpLinear(zLeft, zRight, xRight - xLeft);
         // draw a line from left to right
         for (int x = xLeft; x <= xRight; x++)
         {
-            RGBA shadedColor = material.GetColor() * is[x - xLeft];
+            RGBA shadedColor = material.GetColor() * i;
             this->_canvas.SetPixelFromRGBA(x, y, zSegment[x - xLeft], shadedColor);
         }
     }
@@ -754,7 +733,7 @@ void Rasterizer::_RenderTriangle(const Triangle &triangle, const Material &mater
             this->_DrawTriangleShadedPong(triangle, material, matrixProjection);
             break;
         case ShadingMethod::FLAT_SHADING:
-            this->_DrawTriangleShaded(triangle, material, matrixProjection);
+            this->_DrawTriangleShadedFlat(triangle, material, matrixProjection);
             break;
         default:
             this->_DrawTriangleShadedPong(triangle, material, matrixProjection);

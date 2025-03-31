@@ -43,7 +43,7 @@ private:
 
     void _DrawTriangleFilled(const Triangle &triangle, const Material &material, const Matrix &matrixProjection);
 
-    void _DrawTriangleShaded(const Triangle &triangle, const Material &material, const Matrix &matrixProjection);
+    void _DrawTriangleShadedFlat(const Triangle &triangle, const Material &material, const Matrix &matrixProjection);
 
     void _DrawTriangleShadedGoureau(const Triangle &triangle, const Material &material, const Matrix &matrixProjection);
 
