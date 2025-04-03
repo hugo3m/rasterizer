@@ -25,7 +25,7 @@ export default function Test() {
   const [shadingMethod, setShadingMethod] = useState<Nullable<SelectAttr<ShadingMethod>>>(null); 
   const [inputInfo, setInputInfo] = useState<Nullable<InputInfo>>(null);
   const [fps, setFps] = useState<number>(0);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState<boolean | undefined>(undefined);
 
 
   const cpp: MainModule | undefined = useCpp();
@@ -49,7 +49,7 @@ export default function Test() {
   useEffect(() => {
     const init = async () => {
       if(!cpp) return;
-      
+      if (isMobile == undefined) return;
       setShadingMethods([createShadingMethod(cpp.ShadingMethod.FLAT_SHADING),
         createShadingMethod(cpp.ShadingMethod.GOUREAU_SHADING),
         createShadingMethod(cpp.ShadingMethod.PONG_SHADING),
@@ -58,11 +58,12 @@ export default function Test() {
       setShadingMethod(createShadingMethod(cpp.ShadingMethod.PONG_SHADING));
     };
     init();
-  }, [cpp]);
+  }, [cpp, isMobile]);
 
   useEffect(() => {
     const run = async () => {
       if(!cpp) return;
+      if (isMobile == undefined) return;
       if (!canvasRef.current) return;
       const ctx = canvasRef.current.getContext("2d");
       if (!ctx) return;
@@ -74,11 +75,14 @@ export default function Test() {
     return () => {
       Engine.destroy();
     }
-  }, [cpp, pixels, shadingMethod]);
+  }, [cpp, pixels, shadingMethod, isMobile]);
 
   useEffect(() => {
     if (window.innerWidth <= 600) {
       setIsMobile(true);
+    }
+    else {
+      setIsMobile(false);
     }
   }, []);
 
@@ -168,7 +172,7 @@ export default function Test() {
       );
   };
 
-  const renderPhone = () => {
+  const renderMobile = () => {
     return (
     
       <div className="flex flex-1 flex-col">
@@ -254,5 +258,13 @@ export default function Test() {
       );
   }
 
-  return isMobile ?  renderPhone() : renderLaptop();
+  const renderUndefined = () => {
+    return (
+      <div className="flex flex-1 flex-col">
+        <p>Loading...</p>
+      </div>
+    )
+  }
+
+  return isMobile == undefined ? renderUndefined() : isMobile ? renderMobile() : renderLaptop();
 }
