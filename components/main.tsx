@@ -25,6 +25,8 @@ export default function Test() {
   const [shadingMethod, setShadingMethod] = useState<Nullable<SelectAttr<ShadingMethod>>>(null); 
   const [inputInfo, setInputInfo] = useState<Nullable<InputInfo>>(null);
   const [fps, setFps] = useState<number>(0);
+  const [isMobile, setIsMobile] = useState(false);
+
 
   const cpp: MainModule | undefined = useCpp();
 
@@ -73,6 +75,12 @@ export default function Test() {
       Engine.destroy();
     }
   }, [cpp, pixels, shadingMethod]);
+
+  useEffect(() => {
+    if (window.innerWidth <= 600) {
+      setIsMobile(true);
+    }
+  }, []);
 
   const renderLaptop = () => {
     return (
@@ -246,5 +254,5 @@ export default function Test() {
       );
   }
 
-  return (typeof window !== 'undefined' && window.innerWidth <= 600) ?  renderPhone() : renderLaptop();
+  return isMobile ?  renderPhone() : renderLaptop();
 }
