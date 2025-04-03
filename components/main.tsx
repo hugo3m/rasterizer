@@ -107,7 +107,7 @@ export default function Test() {
               :
             <div className="flex flex-2 flex-col items-center">
               <p>FPS: {fps.toFixed(0)}</p>
-              <canvas className="max-w-[30vw] min-w-[30vw]" ref={canvasRef} width={pixels} height={pixels}/>
+              <canvas className="max-w-[35vw] min-w-[35vw]" ref={canvasRef} width={pixels} height={pixels}/>
               {inputInfo ? <div className="flex flex-col items-center">
                 <div className="flex flex-row">
                     <Input input="Q" isDown={inputInfo.up}/>
