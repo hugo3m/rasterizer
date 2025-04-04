@@ -25,7 +25,6 @@ export default function Test() {
   const [shadingMethod, setShadingMethod] = useState<Nullable<SelectAttr<ShadingMethod>>>(null); 
   const [inputInfo, setInputInfo] = useState<Nullable<InputInfo>>(null);
   const [fps, setFps] = useState<number>(0);
-  const [isMobile, setIsMobile] = useState<boolean | undefined>(undefined);
 
 
   const cpp: MainModule | undefined = useCpp();
@@ -49,7 +48,6 @@ export default function Test() {
   useEffect(() => {
     const init = async () => {
       if(!cpp) return;
-      if (isMobile == undefined) return;
       setShadingMethods([createShadingMethod(cpp.ShadingMethod.FLAT_SHADING),
         createShadingMethod(cpp.ShadingMethod.GOUREAU_SHADING),
         createShadingMethod(cpp.ShadingMethod.PONG_SHADING),
@@ -58,12 +56,11 @@ export default function Test() {
       setShadingMethod(createShadingMethod(cpp.ShadingMethod.PONG_SHADING));
     };
     init();
-  }, [cpp, isMobile]);
+  }, [cpp]);
 
   useEffect(() => {
     const run = async () => {
       if(!cpp) return;
-      if (isMobile == undefined) return;
       if (!canvasRef.current) return;
       const ctx = canvasRef.current.getContext("2d");
       if (!ctx) return;
@@ -75,198 +72,89 @@ export default function Test() {
     return () => {
       Engine.destroy();
     }
-  }, [cpp, pixels, shadingMethod, isMobile]);
+  }, [cpp, pixels, shadingMethod]);
 
-  useEffect(() => {
-    if (window.innerWidth <= 600) {
-      setIsMobile(true);
-    }
-    else {
-      setIsMobile(false);
-    }
-  }, []);
-
-  const renderLaptop = () => {
-    return (
-    
-      <div className="flex flex-1 flex-col">
-        <div className="flex flex-row justify-center">
-          <div className="flex flex-1 flex-col p-12">
-              <span>Presentation:</span>
-              <p>
-                  Homemade rasterizer made by <a className="text-blue-700" href="https://github.com/hugo3m">hugo3m</a> inspired from
-                  <a className="text-blue-700" href="https://gabrielgambetta.com/computer-graphics-from-scratch/index.html"> Computer graphics from scratch, Gabriel Gambetta</a>.
-                    Built using C++ web assembly and NextJS. You can find the repository at <a className="text-blue-700" href="https://github.com/hugo3m/rasterizer/">hugo3m/rasterizer</a>
-                    , or look at the <a className="text-blue-700" href="https://raytracer-hugo3ms-projects.vercel.app/">raytracer</a>.
-              </p>
+  return (
+    <div className="flex flex-1 flex-col">
+      <div className="flex justify-center flex-col sm:flex-row">
+        <div className="flex flex-1 flex-col p-12">
+            <span>Presentation:</span>
+            <p>
+                Homemade rasterizer made by <a className="text-blue-700" href="https://github.com/hugo3m">hugo3m</a> inspired from
+                <a className="text-blue-700" href="https://gabrielgambetta.com/computer-graphics-from-scratch/index.html"> Computer graphics from scratch, Gabriel Gambetta</a>.
+                  Built using C++ web assembly and NextJS. You can find the repository at <a className="text-blue-700" href="https://github.com/hugo3m/rasterizer/">hugo3m/rasterizer</a>
+                  , or look at the <a className="text-blue-700" href="https://raytracer-hugo3ms-projects.vercel.app/">raytracer</a>.
+            </p>
+        </div>
+        <div >
+        {!cpp ? <div className="flex flex-2 flex-col items-center">
+            <p>Loading...</p>
           </div>
-          <div >
-          {!cpp ? <div className="flex flex-2 flex-col items-center">
-              <p>Loading...</p>
-            </div>
-              :
-            <div className="flex flex-2 flex-col items-center">
-              <p>FPS: {fps.toFixed(0)}</p>
-              <canvas className="max-w-[35vw] min-w-[35vw]" ref={canvasRef} width={pixels} height={pixels}/>
-              {inputInfo ? <div className="flex flex-col items-center">
-                <div className="flex flex-row">
-                    <Input input="Q" isDown={inputInfo.up}/>
-                    <Input input="W" isDown={inputInfo.forward}/>
-                    <Input input="E" isDown={inputInfo.down}/>
-                </div>
-                <div className="flex flex-row">
-                    <Input input="A" isDown={inputInfo.left}/>
-                    <Input input="S" isDown={inputInfo.backward}/>
-                    <Input input="D" isDown={inputInfo.right}/>
-                </div>
-                </div> : null}
+            :
+          <div className="flex flex-2 flex-col items-center">
+            <p>FPS: {fps.toFixed(0)}</p>
+            <canvas className="max-w-[70vw] min-w-[70vw] sm:max-w-[35vw] sm:min-w-[35vw]" ref={canvasRef} width={pixels} height={pixels}/>
+            {inputInfo ? <div className="flex flex-col items-center">
+              <div className="flex flex-row">
+                  <Input input="Q" isDown={inputInfo.up}/>
+                  <Input input="W" isDown={inputInfo.forward}/>
+                  <Input input="E" isDown={inputInfo.down}/>
               </div>
-          }
-          </div>
-          <div className="flex flex-1 flex-col p-12">
-            <div>
-              <span>Number of pixels width and height</span>
-              <Slider
-                  value={pixels}
-                  onChange={(event, value) => setPixels(value as number)}
-                  marks
-                  valueLabelDisplay="auto"
-                  min={400}
-                  step={200}
-                  max={1200}
-              />
+              <div className="flex flex-row">
+                  <Input input="A" isDown={inputInfo.left}/>
+                  <Input input="S" isDown={inputInfo.backward}/>
+                  <Input input="D" isDown={inputInfo.right}/>
+              </div>
+              </div> : null}
             </div>
-            <div>
-            {shadingMethods.length > 0 && shadingMethod !== null ? <Box sx={{ minWidth: 120 }}>
-              <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label" sx={{ color: '#1876d1' }}>Shading method</InputLabel>
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    value={shadingMethod.value}
-                    label="Shading method"
-                    onChange={(event) => {setShadingMethod(createShadingMethod(event.target.value as ShadingMethod));}}
-                    sx={{
+        }
+        </div>
+        <div className="flex flex-1 flex-col p-12">
+          <div>
+            <span>Number of pixels width and height</span>
+            <Slider
+                value={pixels}
+                onChange={(event, value) => setPixels(value as number)}
+                marks
+                valueLabelDisplay="auto"
+                min={400}
+                step={200}
+                max={1200}
+            />
+          </div>
+          <div>
+          {shadingMethods.length > 0 && shadingMethod !== null ? <Box sx={{ minWidth: 120 }}>
+            <FormControl fullWidth>
+              <InputLabel id="demo-simple-select-label" sx={{ color: '#1876d1' }}>Shading method</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  value={shadingMethod.value}
+                  label="Shading method"
+                  onChange={(event) => {setShadingMethod(createShadingMethod(event.target.value as ShadingMethod));}}
+                  sx={{
+                    color: '#1876d1',
+                    '.MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#1876d1',
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#1876d1',
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#1876d1',
+                    },
+                    '.MuiSvgIcon-root': {
                       color: '#1876d1',
-                      '.MuiOutlinedInput-notchedOutline': {
-                        borderColor: '#1876d1',
-                      },
-                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                        borderColor: '#1876d1',
-                      },
-                      '&:hover .MuiOutlinedInput-notchedOutline': {
-                        borderColor: '#1876d1',
-                      },
-                      '.MuiSvgIcon-root': {
-                        color: '#1876d1',
-                      },
-                    }}
-                  >
-                    {shadingMethods.map((d, index) => <MenuItem key={index} value={d.value}>{d.label}</MenuItem>)}
-                  </Select>
-              </FormControl>
-            </Box>: null}
-            </div>
-          </div>
+                    },
+                  }}
+                >
+                  {shadingMethods.map((d, index) => <MenuItem key={index} value={d.value}>{d.label}</MenuItem>)}
+                </Select>
+            </FormControl>
+          </Box>: null}
           </div>
         </div>
-      );
-  };
-
-  const renderMobile = () => {
-    return (
-    
-      <div className="flex flex-1 flex-col">
-        <div className="flex flex-col justify-center">
-          <div className="flex flex-1 flex-col p-12">
-              <span>Presentation:</span>
-              <p>
-                  Homemade rasterizer made by <a className="text-blue-700" href="https://github.com/hugo3m">hugo3m</a> inspired from
-                  <a className="text-blue-700" href="https://gabrielgambetta.com/computer-graphics-from-scratch/index.html"> Computer graphics from scratch, Gabriel Gambetta</a>.
-                    Built using C++ web assembly and NextJS. You can find the repository at <a className="text-blue-700" href="https://github.com/hugo3m/rasterizer/">hugo3m/rasterizer</a>
-                    , or look at the <a className="text-blue-700" href="https://raytracer-hugo3ms-projects.vercel.app/">raytracer</a>.
-              </p>
-          </div>
-          <div >
-          {!cpp ? <div className="flex flex-2 flex-col items-center">
-              <p>Loading...</p>
-            </div>
-              :
-            <div className="flex flex-2 flex-col items-center">
-              <p>FPS: {fps.toFixed(0)}</p>
-              <canvas className="max-w-[70vw] min-w-[70vw]" ref={canvasRef} width={pixels} height={pixels}/>
-              {inputInfo ? <div className="flex flex-col items-center">
-                <div className="flex flex-row">
-                    <Input input="Q" isDown={inputInfo.up}/>
-                    <Input input="W" isDown={inputInfo.forward}/>
-                    <Input input="E" isDown={inputInfo.down}/>
-                </div>
-                <div className="flex flex-row">
-                    <Input input="A" isDown={inputInfo.left}/>
-                    <Input input="S" isDown={inputInfo.backward}/>
-                    <Input input="D" isDown={inputInfo.right}/>
-                </div>
-                </div> : null}
-              </div>
-          }
-          </div>
-          <div className="flex flex-1 flex-col p-12">
-            <div>
-              <span>Number of pixels width and height</span>
-              <Slider
-                  value={pixels}
-                  onChange={(event, value) => setPixels(value as number)}
-                  marks
-                  valueLabelDisplay="auto"
-                  min={400}
-                  step={200}
-                  max={1200}
-              />
-            </div>
-            <div>
-            {shadingMethods.length > 0 && shadingMethod !== null ? <Box sx={{ minWidth: 120 }}>
-              <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label" sx={{ color: '#1876d1' }}>Shading method</InputLabel>
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    value={shadingMethod.value}
-                    label="Shading method"
-                    onChange={(event) => {setShadingMethod(createShadingMethod(event.target.value as ShadingMethod));}}
-                    sx={{
-                      color: '#1876d1',
-                      '.MuiOutlinedInput-notchedOutline': {
-                        borderColor: '#1876d1',
-                      },
-                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                        borderColor: '#1876d1',
-                      },
-                      '&:hover .MuiOutlinedInput-notchedOutline': {
-                        borderColor: '#1876d1',
-                      },
-                      '.MuiSvgIcon-root': {
-                        color: '#1876d1',
-                      },
-                    }}
-                  >
-                    {shadingMethods.map((d, index) => <MenuItem key={index} value={d.value}>{d.label}</MenuItem>)}
-                  </Select>
-              </FormControl>
-            </Box>: null}
-            </div>
-          </div>
-          </div>
         </div>
-      );
-  }
-
-  const renderUndefined = () => {
-    return (
-      <div className="flex flex-1 flex-col">
-        <p>Loading...</p>
       </div>
-    )
-  }
-
-  return isMobile == undefined ? renderUndefined() : isMobile ? renderMobile() : renderLaptop();
+    );
 }
